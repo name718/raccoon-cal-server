@@ -15,10 +15,10 @@ importers:
         specifier: ^18.4.0
         version: artifactory.intra.xiaojukeji.com/@commitlint/config-conventional@18.6.3
       '@typescript-eslint/eslint-plugin':
-        specifier: ^6.12.0
+        specifier: ^6.21.0
         version: artifactory.intra.xiaojukeji.com/@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/parser':
-        specifier: ^6.12.0
+        specifier: ^6.21.0
         version: artifactory.intra.xiaojukeji.com/@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3)
       eslint:
         specifier: ^8.54.0
