@@ -10,20 +10,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// 用户表 - 存储用户基本信息和账户状态
 model User {
+  /// 用户ID，主键，自增
   id          Int      @id @default(autoincrement())
+
+  /// 用户名，唯一，用于登录和显示
   username    String   @unique @db.VarChar(50)
+
+  /// 邮箱地址，唯一，用于登录和通知
   email       String   @unique @db.VarChar(100)
+
+  /// 密码哈希值，使用bcrypt加密
   passwordHash String  @map("password_hash") @db.VarChar(255)
+
+  /// 用户头像URL，可选
   avatarUrl   String?  @map("avatar_url") @db.VarChar(255)
 
-  // 用户状态和元数据
+  /// 账户是否激活，默认true，用于软删除
   isActive    Boolean  @default(true) @map("is_active")
+
+  /// 邮箱是否已验证，默认false
   isVerified  Boolean  @default(false) @map("is_verified")
+
+  /// 最后登录时间，可选
   lastLoginAt DateTime? @map("last_login_at")
 
-  // 时间戳
+  /// 创建时间，自动设置
   createdAt   DateTime @default(now()) @map("created_at")
+
+  /// 更新时间，自动更新
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("users")
