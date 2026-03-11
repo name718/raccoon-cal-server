@@ -1,0 +1,85 @@
+{
+  "name": "raccoon-cal",
+  "version": "1.0.0",
+  "description": "一款AI驱动的游戏化饮食管理应用",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"pnpm dev:server\" \"pnpm dev:mobile\"",
+    "dev:server": "pnpm --filter server dev",
+    "dev:mobile": "pnpm --filter mobile start",
+    "dev:ios": "pnpm --filter mobile ios",
+    "dev:android": "pnpm --filter mobile android",
+    "build": "pnpm -r build",
+    "build:server": "pnpm --filter server build",
+    "build:mobile": "pnpm --filter mobile build",
+    "test": "pnpm -r test",
+    "test:server": "pnpm --filter server test",
+    "test:mobile": "pnpm --filter mobile test",
+    "test:watch": "pnpm -r test:watch",
+    "test:coverage": "pnpm -r test:coverage",
+    "test:integration": "pnpm --filter server test:integration",
+    "test:e2e": "pnpm --filter mobile test:e2e",
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "postinstall": "husky install",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.0",
+    "@commitlint/config-conventional": "^18.4.0",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.1.0",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.10.0",
+  "keywords": [
+    "react-native",
+    "express",
+    "mongodb",
+    "ai",
+    "food-tracking",
+    "gamification",
+    "health",
+    "calorie-counter"
+  ],
+  "author": "RaccoonCal Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/raccoon-cal.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/raccoon-cal/issues"
+  },
+  "homepage": "https://github.com/your-org/raccoon-cal#readme",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  }
+}

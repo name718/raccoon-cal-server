@@ -1,0 +1,110 @@
+{
+  "name": "@raccoon-cal/mobile",
+  "version": "1.0.0",
+  "description": "浣熊卡路里移动端应用",
+  "main": "index.js",
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "build": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle",
+    "build:ios": "react-native bundle --platform ios --dev false --entry-file index.js --bundle-output ios/main.jsbundle",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "detox test",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "clean": "rm -rf node_modules && cd ios && xcodebuild clean && cd ../android && ./gradlew clean && cd ..",
+    "postinstall": "cd ios && pod install && cd .."
+  },
+  "dependencies": {
+    "@raccoon-cal/shared": "workspace:*",
+    "react": "18.2.0",
+    "react-native": "0.72.7",
+    "@react-navigation/native": "^6.1.9",
+    "@react-navigation/stack": "^6.3.20",
+    "@react-navigation/bottom-tabs": "^6.5.11",
+    "@reduxjs/toolkit": "^1.9.7",
+    "react-redux": "^8.1.3",
+    "redux-persist": "^6.0.0",
+    "react-native-image-picker": "^7.0.3",
+    "react-native-image-resizer": "^3.0.7",
+    "react-native-permissions": "^4.0.1",
+    "react-native-camera": "^4.2.1",
+    "react-native-vector-icons": "^10.0.2",
+    "react-native-linear-gradient": "^2.8.3",
+    "react-native-gesture-handler": "^2.14.0",
+    "react-native-reanimated": "^3.6.0",
+    "react-native-safe-area-context": "^4.7.4",
+    "react-native-screens": "^3.27.0",
+    "lottie-react-native": "^6.4.1",
+    "react-native-svg": "^14.0.0",
+    "react-native-async-storage": "^1.19.5",
+    "react-native-keychain": "^8.1.3",
+    "react-native-device-info": "^10.11.0",
+    "react-native-share": "^10.0.2",
+    "react-native-push-notification": "^8.1.1",
+    "@react-native-firebase/app": "^18.6.1",
+    "@react-native-firebase/messaging": "^18.6.1",
+    "@react-native-firebase/analytics": "^18.6.1",
+    "react-native-chart-kit": "^6.12.0",
+    "react-native-modal": "^13.0.1",
+    "react-native-toast-message": "^2.1.7",
+    "axios": "^1.6.2",
+    "date-fns": "^2.30.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.5",
+    "@babel/preset-env": "^7.23.5",
+    "@babel/runtime": "^7.23.5",
+    "@react-native/eslint-config": "^0.72.2",
+    "@react-native/metro-config": "^0.72.11",
+    "@tsconfig/react-native": "^3.0.2",
+    "@types/react": "^18.2.42",
+    "@types/react-test-renderer": "^18.0.7",
+    "babel-jest": "^29.7.0",
+    "detox": "^20.13.5",
+    "jest": "^29.7.0",
+    "metro-react-native-babel-preset": "0.76.8",
+    "react-test-renderer": "18.2.0",
+    "typescript": "^5.3.2",
+    "@testing-library/react-native": "^12.4.2",
+    "@testing-library/jest-native": "^5.4.3"
+  },
+  "jest": {
+    "preset": "react-native",
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-native/extend-expect"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(react-native|@react-native|react-navigation|@react-navigation|lottie-react-native)/)"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!src/**/*.d.ts"
+    ]
+  },
+  "detox": {
+    "testRunner": "jest",
+    "runnerConfig": "e2e/config.json",
+    "configurations": {
+      "ios.sim.debug": {
+        "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/RaccoonCal.app",
+        "build": "xcodebuild -workspace ios/RaccoonCal.xcworkspace -scheme RaccoonCal -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
+        "type": "ios.simulator",
+        "device": {
+          "type": "iPhone 14"
+        }
+      },
+      "android.emu.debug": {
+        "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
+        "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+        "type": "android.emulator",
+        "device": {
+          "avdName": "Pixel_4_API_30"
+        }
+      }
+    }
+  }
+}

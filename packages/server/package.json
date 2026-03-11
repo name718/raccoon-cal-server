@@ -1,0 +1,66 @@
+{
+  "name": "@raccoon-cal/server",
+  "version": "1.0.0",
+  "description": "浣熊卡路里服务端",
+  "main": "dist/app.js",
+  "scripts": {
+    "dev": "nodemon src/app.js",
+    "start": "node dist/app.js",
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:integration": "jest --config jest.integration.config.js",
+    "lint": "eslint src/**/*.{js,ts}",
+    "lint:fix": "eslint src/**/*.{js,ts} --fix",
+    "db:seed": "node scripts/seed.js",
+    "db:migrate": "node scripts/migrate.js",
+    "clean": "rm -rf dist node_modules"
+  },
+  "dependencies": {
+    "@raccoon-cal/shared": "workspace:*",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3",
+    "redis": "^4.6.10",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.33.0",
+    "axios": "^1.6.2",
+    "joi": "^17.11.0",
+    "winston": "^3.11.0",
+    "dotenv": "^16.3.1",
+    "compression": "^1.7.4",
+    "express-validator": "^7.0.1",
+    "socket.io": "^4.7.4",
+    "node-cron": "^3.0.3",
+    "aws-sdk": "^2.1498.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/multer": "^1.4.11",
+    "@types/compression": "^1.7.5",
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "mongodb-memory-server": "^9.1.3",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "testMatch": ["<rootDir>/tests/unit/**/*.test.js"],
+    "collectCoverageFrom": [
+      "src/**/*.{js,ts}",
+      "!src/app.js"
+    ]
+  }
+}
