@@ -19,7 +19,8 @@ AI驱动的游戏化饮食管理应用后端服务
 
 - **运行时**: Node.js 18+
 - **框架**: Express.js
-- **数据库**: MongoDB + Redis
+- **数据库**: MySQL + Redis
+- **ORM**: Prisma / TypeORM
 - **认证**: JWT + Passport
 - **文件存储**: AWS S3 / 阿里云OSS
 - **AI服务**: LogMeal API / CalorieNinja API
@@ -60,7 +61,7 @@ pnpm test
 cp packages/server/.env.example packages/server/.env
 
 # 配置必要的环境变量
-# - DATABASE_URL: MongoDB连接字符串
+# - DATABASE_URL: MySQL连接字符串 (mysql://user:password@localhost:3306/raccoon_cal)
 # - REDIS_URL: Redis连接字符串
 # - JWT_SECRET: JWT密钥
 # - AI_API_KEY: 食物识别API密钥

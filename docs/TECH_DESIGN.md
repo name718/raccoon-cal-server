@@ -12,7 +12,7 @@
                                 │
                                 ▼
                        ┌─────────────────┐
-                       │   MongoDB +     │
+                       │    MySQL +      │
                        │     Redis       │
                        └─────────────────┘
 ```
@@ -22,7 +22,8 @@
 | 层级         | 技术选型             | 理由                                       |
 | ------------ | -------------------- | ------------------------------------------ |
 | **后端**     | Express.js + Node.js | 轻量级，成熟稳定，开发效率高               |
-| **数据库**   | MongoDB              | 文档型数据库，适合用户数据和游戏化数据存储 |
+| **数据库**   | MySQL                | 关系型数据库，ACID特性，适合结构化数据存储 |
+| **ORM**      | Prisma / TypeORM     | 类型安全的数据库操作，自动迁移管理         |
 | **缓存**     | Redis                | 高性能缓存，用于积分排行榜等实时数据       |
 | **认证**     | JWT + Passport       | 无状态认证，支持多端登录                   |
 | **文件存储** | AWS S3 / 阿里云OSS   | 云存储服务，用于用户头像和食物图片         |
@@ -74,51 +75,126 @@ docker-compose.yml # 本地开发环境
 
 ````
 
-## 3. 核心功能技术实现
+## 3. 数据库设计
 
-### 3.1 拍照识别卡路里系统
+### 3.1 MySQL 表结构设计
 
-待开发...
+#### 用户表 (users)
+```sql
+CREATE TABLE users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  avatar_url VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_email (email),
+  INDEX idx_username (username)
+);
+```
 
-### 3.2 虚拟宠物养成系统
+#### 食物记录表 (food_records)
+```sql
+CREATE TABLE food_records (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  food_name VARCHAR(100) NOT NULL,
+  calories DECIMAL(8,2) NOT NULL,
+  protein DECIMAL(6,2),
+  carbs DECIMAL(6,2),
+  fat DECIMAL(6,2),
+  image_url VARCHAR(255),
+  recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_user_date (user_id, recorded_at)
+);
+```
 
-待开发...
+#### 虚拟宠物表 (pets)
+```sql
+CREATE TABLE pets (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT UNIQUE NOT NULL,
+  name VARCHAR(50) DEFAULT '小浣熊',
+  level INT DEFAULT 1,
+  experience INT DEFAULT 0,
+  happiness INT DEFAULT 50,
+  energy INT DEFAULT 100,
+  last_fed_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
 
-### 3.3 社交功能实现
+#### 任务表 (tasks)
+```sql
+CREATE TABLE tasks (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  task_type ENUM('daily', 'weekly', 'achievement') NOT NULL,
+  title VARCHAR(100) NOT NULL,
+  description TEXT,
+  target_value INT NOT NULL,
+  current_value INT DEFAULT 0,
+  reward_exp INT DEFAULT 0,
+  completed BOOLEAN DEFAULT FALSE,
+  completed_at TIMESTAMP NULL,
+  expires_at TIMESTAMP NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_user_type (user_id, task_type),
+  INDEX idx_expires (expires_at)
+);
+```
 
-待开发...
+### 3.2 Redis 缓存设计
 
-## 4. 数据库设计
+#### 缓存键命名规范
+```
+user:profile:{user_id}           # 用户基本信息
+user:daily_calories:{user_id}:{date}  # 每日卡路里统计
+leaderboard:weekly               # 周排行榜
+pet:status:{user_id}            # 宠物状态
+session:{token}                 # 用户会话
+```
 
-### 4.1 MongoDB 集合设计
+#### 缓存策略
+- **用户信息**: TTL 1小时，写入时更新
+- **排行榜**: TTL 10分钟，定时刷新
+- **宠物状态**: TTL 30分钟，实时更新
+- **会话信息**: TTL 7天，滑动过期
 
-待设计...
+## 4. API 设计规范
 
-### 4.2 Redis 缓存设计
+### 4.1 RESTful API 设计
 
-待设计...
-
-## 5. API 设计规范
-
-### 5.1 RESTful API 设计
-
-待设计...
-
-### 5.2 响应格式标准
-
-```swift
-// Swift 数据模型
-struct APIResponse<T: Codable>: Codable {
-    let success: Bool
-    let data: T?
-    let error: APIError?
-    let timestamp: String
+#### 响应格式标准
+```typescript
+interface APIResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+  };
+  timestamp: string;
 }
+```
 
-struct APIError: Codable {
-    let code: String
-    let message: String
-}
+#### 主要 API 端点
+```
+POST   /api/auth/register        # 用户注册
+POST   /api/auth/login           # 用户登录
+GET    /api/user/profile         # 获取用户信息
+POST   /api/food/recognize       # 食物识别
+GET    /api/food/records         # 获取饮食记录
+POST   /api/food/records         # 添加饮食记录
+GET    /api/pet/status           # 获取宠物状态
+POST   /api/pet/feed             # 喂养宠物
+GET    /api/tasks               # 获取任务列表
+POST   /api/tasks/{id}/complete  # 完成任务
 ````
 
 ## 6. 性能优化策略
