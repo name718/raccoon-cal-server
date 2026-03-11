@@ -5,6 +5,7 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import { config } from '@/config';
 import { logger } from '@/utils/logger';
+import { database } from '@/config/database';
 import { errorHandler } from '@/middleware/errorHandler';
 import { notFoundHandler } from '@/middleware/notFoundHandler';
 import { requestLogger } from '@/middleware/requestLogger';
@@ -35,11 +36,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 
 // 健康检查
-app.get('/health', (req, res) => {
+app.get('/health', async (req, res) => {
+  const dbHealth = await database.healthCheck();
+
   res.status(200).json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
+    database: dbHealth ? 'connected' : 'disconnected',
   });
 });
 
@@ -59,9 +63,36 @@ app.use(errorHandler);
 const PORT = config.server.port;
 const HOST = config.server.host;
 
-app.listen(PORT, HOST, () => {
-  logger.info(`Server is running on http://${HOST}:${PORT}`);
-  logger.info(`Environment: ${config.env}`);
+// 启动服务器
+async function startServer() {
+  try {
+    // 连接数据库
+    await database.connect();
+
+    // 启动 HTTP 服务器
+    app.listen(PORT, HOST, () => {
+      logger.info(`Server is running on http://${HOST}:${PORT}`);
+      logger.info(`Environment: ${config.env}`);
+    });
+  } catch (error) {
+    logger.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// 优雅关闭
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  await database.disconnect();
+  process.exit(0);
 });
+
+process.on('SIGINT', async () => {
+  logger.info('SIGINT received, shutting down gracefully');
+  await database.disconnect();
+  process.exit(0);
+});
+
+startServer();
 
 export default app;

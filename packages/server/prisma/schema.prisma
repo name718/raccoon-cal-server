@@ -16,104 +16,19 @@ model User {
   email       String   @unique @db.VarChar(100)
   passwordHash String  @map("password_hash") @db.VarChar(255)
   avatarUrl   String?  @map("avatar_url") @db.VarChar(255)
+
+  // 用户状态和元数据
+  isActive    Boolean  @default(true) @map("is_active")
+  isVerified  Boolean  @default(false) @map("is_verified")
+  lastLoginAt DateTime? @map("last_login_at")
+
+  // 时间戳
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  foodRecords  FoodRecord[]
-  pet          Pet?
-  tasks        Task[]
-  friendships  Friendship[] @relation("UserFriendships")
-  friendOf     Friendship[] @relation("FriendOf")
 
   @@map("users")
   @@index([email])
   @@index([username])
-}
-
-model FoodRecord {
-  id         Int      @id @default(autoincrement())
-  userId     Int      @map("user_id")
-  foodName   String   @map("food_name") @db.VarChar(100)
-  calories   Decimal  @db.Decimal(8, 2)
-  protein    Decimal? @db.Decimal(6, 2)
-  carbs      Decimal? @db.Decimal(6, 2)
-  fat        Decimal? @db.Decimal(6, 2)
-  imageUrl   String?  @map("image_url") @db.VarChar(255)
-  recordedAt DateTime @default(now()) @map("recorded_at")
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("food_records")
-  @@index([userId, recordedAt])
-}
-
-model Pet {
-  id         Int       @id @default(autoincrement())
-  userId     Int       @unique @map("user_id")
-  name       String    @default("小浣熊") @db.VarChar(50)
-  level      Int       @default(1)
-  experience Int       @default(0)
-  happiness  Int       @default(50)
-  energy     Int       @default(100)
-  lastFedAt  DateTime? @map("last_fed_at")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("pets")
-}
-
-model Task {
-  id           Int       @id @default(autoincrement())
-  userId       Int       @map("user_id")
-  taskType     TaskType  @map("task_type")
-  title        String    @db.VarChar(100)
-  description  String?   @db.Text
-  targetValue  Int       @map("target_value")
-  currentValue Int       @default(0) @map("current_value")
-  rewardExp    Int       @default(0) @map("reward_exp")
-  completed    Boolean   @default(false)
-  completedAt  DateTime? @map("completed_at")
-  expiresAt    DateTime? @map("expires_at")
-  createdAt    DateTime  @default(now()) @map("created_at")
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("tasks")
-  @@index([userId, taskType])
-  @@index([expiresAt])
-}
-
-model Friendship {
-  id        Int              @id @default(autoincrement())
-  userId    Int              @map("user_id")
-  friendId  Int              @map("friend_id")
-  status    FriendshipStatus @default(pending)
-  createdAt DateTime         @default(now()) @map("created_at")
-  updatedAt DateTime         @updatedAt @map("updated_at")
-
-  // Relations
-  user   User @relation("UserFriendships", fields: [userId], references: [id], onDelete: Cascade)
-  friend User @relation("FriendOf", fields: [friendId], references: [id], onDelete: Cascade)
-
-  @@map("friendships")
-  @@unique([userId, friendId], name: "unique_friendship")
-  @@index([userId, status])
-}
-
-enum TaskType {
-  daily
-  weekly
-  achievement
-}
-
-enum FriendshipStatus {
-  pending
-  accepted
-  blocked
+  @@index([isActive])
+  @@index([createdAt])
 }
