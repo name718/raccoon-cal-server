@@ -9,41 +9,22 @@ class Database {
     this.prisma = new PrismaClient({
       log: [
         {
-          emit: 'event',
+          emit: 'stdout',
           level: 'query',
         },
         {
-          emit: 'event',
+          emit: 'stdout',
           level: 'error',
         },
         {
-          emit: 'event',
+          emit: 'stdout',
           level: 'info',
         },
         {
-          emit: 'event',
+          emit: 'stdout',
           level: 'warn',
         },
       ],
-    });
-
-    // 监听 Prisma 事件
-    this.prisma.$on('query', e => {
-      logger.debug('Query: ' + e.query);
-      logger.debug('Params: ' + e.params);
-      logger.debug('Duration: ' + e.duration + 'ms');
-    });
-
-    this.prisma.$on('error', e => {
-      logger.error('Prisma Error: ' + e.message);
-    });
-
-    this.prisma.$on('info', e => {
-      logger.info('Prisma Info: ' + e.message);
-    });
-
-    this.prisma.$on('warn', e => {
-      logger.warn('Prisma Warning: ' + e.message);
     });
   }
 

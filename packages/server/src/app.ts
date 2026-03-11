@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -9,7 +9,7 @@ import { errorHandler } from '@/middleware/errorHandler';
 import { notFoundHandler } from '@/middleware/notFoundHandler';
 import { requestLogger } from '@/middleware/requestLogger';
 
-const app = express();
+const app: Application = express();
 
 // 安全中间件
 app.use(helmet());
