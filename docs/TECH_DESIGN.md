@@ -1,4 +1,4 @@
-# 技术设计文档：浣熊卡路里
+# 技术设计文档：浣熊卡路里服务端
 
 ## 1. 系统架构概览
 
@@ -6,8 +6,8 @@
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   iOS Native    │    │   Express API   │    │   External APIs │
-│   Swift App     │◄──►│     Server      │◄──►│  (LogMeal/etc)  │
+│   Mobile Apps   │    │   Express API   │    │   External APIs │
+│  (iOS/Android)  │◄──►│     Server      │◄──►│  (LogMeal/etc)  │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
                                 │
                                 ▼
@@ -19,59 +19,60 @@
 
 ### 1.2 技术栈选择
 
-| 层级       | 技术选型                     | 理由                                        |
-| ---------- | ---------------------------- | ------------------------------------------- |
-| **前端**   | iOS Native (Swift + SwiftUI) | 原生性能优异，用户体验流畅，充分利用iOS特性 |
-| **后端**   | Express.js + Node.js         | 轻量级，成熟稳定，开发效率高                |
-| **数据库** | MongoDB                      | 文档型数据库，适合用户数据和游戏化数据存储  |
-| **缓存**   | Redis                        | 高性能缓存，用于积分排行榜等实时数据        |
-| **包管理** | Swift Package Manager        | iOS原生包管理工具，与Xcode深度集成          |
-| **部署**   | Docker + AWS/阿里云          | 容器化部署，易于扩展和维护                  |
+| 层级         | 技术选型             | 理由                                       |
+| ------------ | -------------------- | ------------------------------------------ |
+| **后端**     | Express.js + Node.js | 轻量级，成熟稳定，开发效率高               |
+| **数据库**   | MongoDB              | 文档型数据库，适合用户数据和游戏化数据存储 |
+| **缓存**     | Redis                | 高性能缓存，用于积分排行榜等实时数据       |
+| **认证**     | JWT + Passport       | 无状态认证，支持多端登录                   |
+| **文件存储** | AWS S3 / 阿里云OSS   | 云存储服务，用于用户头像和食物图片         |
+| **包管理**   | pnpm                 | 高效的包管理工具，支持monorepo             |
+| **部署**     | Docker + PM2         | 容器化部署，进程管理，易于扩展和维护       |
 
 ## 2. 项目结构设计
 
-### 2.1 项目结构
+### 2.1 服务端项目结构
 
 ```
-RaccoonCal/
-├── RaccoonCal.xcodeproj/       # Xcode项目文件
-├── RaccoonCal/                 # iOS应用源码
-│   ├── App/                    # 应用入口和配置
-│   │   ├── RaccoonCalApp.swift # 应用主入口
-│   │   └── Info.plist          # 应用配置
-│   ├── Views/                  # SwiftUI视图
-│   │   ├── ContentView.swift   # 主视图
-│   │   ├── Camera/             # 拍照相关视图
-│   │   ├── Pet/                # 虚拟宠物视图
-│   │   ├── Social/             # 社交功能视图
-│   │   └── Profile/            # 用户资料视图
-│   ├── Models/                 # 数据模型
-│   │   ├── User.swift          # 用户模型
-│   │   ├── Food.swift          # 食物模型
-│   │   └── Pet.swift           # 宠物模型
-│   ├── Services/               # 网络和业务服务
-│   │   ├── APIService.swift    # API服务
-│   │   ├── CameraService.swift # 相机服务
-│   │   └── CoreDataService.swift # 本地数据服务
-│   ├── Utils/                  # 工具类
-│   │   ├── Extensions/         # Swift扩展
-│   │   ├── Constants.swift     # 常量定义
-│   │   └── Helpers.swift       # 辅助函数
-│   └── Assets.xcassets/        # 图片和颜色资源
-├── server/                     # Express服务端
-│   ├── src/
-│   │   ├── controllers/        # 控制器
-│   │   ├── models/             # 数据模型
-│   │   ├── routes/             # 路由定义
-│   │   ├── services/           # 业务逻辑
-│   │   ├── middleware/         # 中间件
-│   │   └── utils/              # 工具函数
-│   ├── tests/                  # 测试文件
-│   └── package.json
+raccoon-cal-server/
+├── packages/
+│   ├── server/                 # Express 服务端
+│   │   ├── src/
+│   │   │   ├── controllers/    # 控制器层
+│   │   │   ├── services/       # 业务逻辑层
+│   │   │   ├── models/         # 数据模型
+│   │   │   ├── routes/         # 路由定义
+│   │   │   ├── middleware/     # 中间件
+│   │   │   ├── utils/          # 工具函数
+│   │   │   ├── config/         # 配置文件
+│   │   │   └── app.ts          # 应用入口
+│   │   ├── tests/              # 测试文件
+│   │   ├── Dockerfile          # Docker配置
+│   │   └── package.json        # 依赖配置
+│   └── shared/                 # 共享类型和工具
+│       ├── src/
+│       │   ├── types/          # TypeScript类型定义
+│       │   ├── constants/      # 常量定义
+│       │   └── utils/          # 共享工具函数
+│       └── package.json
 ├── docs/                       # 项目文档
 ├── scripts/                    # 构建和部署脚本
-└── docker-compose.yml          # 本地开发环境
+├── docker-compose.yml          # Docker编排
+└── package.json                # 根目录配置
 ```
+
+│ │ └── Pet.swift # 宠物模型 │ ├── Services/ # 网络和业务服务 │ │ ├──
+APIService.swift # API服务 │ │ ├── CameraService.swift # 相机服务 │ │ └──
+CoreDataService.swift # 本地数据服务 │ ├── Utils/ # 工具类 │ │ ├── Extensions/ #
+Swift扩展 │ │ ├── Constants.swift # 常量定义 │ │ └── Helpers.swift # 辅助函数 │
+└── Assets.xcassets/ # 图片和颜色资源 ├── server/ # Express服务端 │ ├── src/ │ │
+├── controllers/ # 控制器 │ │ ├── models/ # 数据模型 │ │ ├──
+routes/ # 路由定义 │ │ ├── services/ # 业务逻辑 │ │ ├── middleware/ # 中间件 │ │
+└── utils/ # 工具函数 │ ├── tests/ # 测试文件 │ └── package.json ├──
+docs/ # 项目文档 ├── scripts/ # 构建和部署脚本 └──
+docker-compose.yml # 本地开发环境
+
+````
 
 ## 3. 核心功能技术实现
 
@@ -118,7 +119,7 @@ struct APIError: Codable {
     let code: String
     let message: String
 }
-```
+````
 
 ## 6. 性能优化策略
 

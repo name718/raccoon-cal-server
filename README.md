@@ -1,33 +1,35 @@
-# 浣熊卡路里（RaccoonCal）
+# 浣熊卡路里服务端（RaccoonCal Server）
 
-一款AI驱动的游戏化饮食管理应用
+AI驱动的游戏化饮食管理应用后端服务
 
 ## 项目概述
 
-浣熊卡路里是一款面向年轻用户（18-35岁）的轻量级饮食记录应用，以AI拍照识别为核心，通过养成系游戏化体验降低用户记录负担，让健康管理变得有趣。
+浣熊卡路里服务端为移动端应用提供完整的后端API服务，包括用户管理、食物识别、卡路里计算、游戏化系统等核心功能。
 
-## 核心特性
+## 核心功能
 
-- 🤳 **极简记录**：拍照即得卡路里，无需手动输入
-- 🦝 **情感陪伴**：虚拟宠物（浣熊）以幽默方式反馈饮食
-- 🎮 **正向激励**：游戏化任务鼓励健康行为
-- 👥 **轻量社交**：好友PK和分享功能
+- 🔐 **用户认证**：JWT认证、用户注册登录
+- 🍎 **食物识别**：AI拍照识别食物和卡路里计算
+- 📊 **数据管理**：饮食记录、营养分析、统计报表
+- 🦝 **游戏化系统**：虚拟宠物、任务系统、积分奖励
+- 👥 **社交功能**：好友系统、排行榜、分享功能
+- 📱 **API服务**：RESTful API、实时通知
 
 ## 技术栈
 
-- **前端**: React Native
-- **后端**: Express.js + Node.js
-- **包管理**: pnpm (多包管理)
+- **运行时**: Node.js 18+
+- **框架**: Express.js
 - **数据库**: MongoDB + Redis
-- **云服务**: AWS/阿里云
-- **AI识别**: LogMeal API / CalorieNinja API
+- **认证**: JWT + Passport
+- **文件存储**: AWS S3 / 阿里云OSS
+- **AI服务**: LogMeal API / CalorieNinja API
+- **部署**: Docker + PM2
 
 ## 项目结构
 
 ```
-raccoon-cal/
+raccoon-cal-server/
 ├── packages/
-│   ├── mobile/          # React Native 移动端
 │   ├── server/          # Express 服务端
 │   └── shared/          # 共享类型和工具
 ├── docs/               # 项目文档
@@ -41,11 +43,27 @@ raccoon-cal/
 # 安装依赖
 pnpm install
 
-# 启动开发环境
+# 启动开发服务器
 pnpm dev
 
 # 构建项目
 pnpm build
+
+# 运行测试
+pnpm test
+```
+
+## 环境配置
+
+```bash
+# 复制环境变量模板
+cp packages/server/.env.example packages/server/.env
+
+# 配置必要的环境变量
+# - DATABASE_URL: MongoDB连接字符串
+# - REDIS_URL: Redis连接字符串
+# - JWT_SECRET: JWT密钥
+# - AI_API_KEY: 食物识别API密钥
 ```
 
 ## 文档
@@ -58,9 +76,26 @@ pnpm build
 ## 开发路线图
 
 - [x] 项目初始化和架构设计
-- [ ] 核心功能开发（第1个月）
-- [ ] 游戏化系统（第2个月）
-- [ ] 社交与优化（第3个月）
+- [ ] 用户认证系统（第1周）
+- [ ] 食物识别API集成（第2周）
+- [ ] 数据管理和统计（第3周）
+- [ ] 游戏化系统（第4周）
+- [ ] 社交功能和优化（第5-6周）
+
+## API文档
+
+服务启动后访问 `http://localhost:3000/api-docs` 查看完整的API文档。
+
+## 部署
+
+```bash
+# 使用Docker部署
+docker-compose up -d
+
+# 或使用PM2部署
+pnpm build
+pm2 start ecosystem.config.js
+```
 
 ## 许可证
 

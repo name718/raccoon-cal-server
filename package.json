@@ -1,27 +1,18 @@
 {
-  "name": "raccoon-cal",
+  "name": "raccoon-cal-server",
   "version": "1.0.0",
-  "description": "一款AI驱动的游戏化饮食管理应用",
+  "description": "浣熊卡路里服务端 - AI驱动的饮食管理应用后端服务",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"pnpm dev:server\" \"pnpm dev:mobile\"",
-    "dev:server": "pnpm --filter server dev",
-    "dev:mobile": "pnpm --filter mobile start",
-    "dev:ios": "pnpm --filter mobile ios",
-    "dev:android": "pnpm --filter mobile android",
+    "dev": "pnpm --filter server dev",
     "build": "pnpm -r build",
-    "build:server": "pnpm --filter server build",
-    "build:mobile": "pnpm --filter mobile build",
     "test": "pnpm -r test",
-    "test:server": "pnpm --filter server test",
-    "test:mobile": "pnpm --filter mobile test",
     "test:watch": "pnpm -r test:watch",
     "test:coverage": "pnpm -r test:coverage",
     "test:integration": "pnpm --filter server test:integration",
-    "test:e2e": "pnpm --filter mobile test:e2e",
     "lint": "pnpm -r lint",
     "lint:fix": "pnpm -r lint:fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
@@ -34,13 +25,9 @@
     "@commitlint/config-conventional": "^18.4.0",
     "@typescript-eslint/eslint-plugin": "^6.12.0",
     "@typescript-eslint/parser": "^6.12.0",
-    "concurrently": "^8.2.2",
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-native": "^4.1.0",
     "husky": "^8.0.3",
     "lint-staged": "^15.1.0",
     "prettier": "^3.1.0",
@@ -52,25 +39,26 @@
   },
   "packageManager": "pnpm@8.10.0",
   "keywords": [
-    "react-native",
     "express",
+    "nodejs",
     "mongodb",
+    "redis",
     "ai",
     "food-tracking",
-    "gamification",
-    "health",
+    "api",
+    "backend",
     "calorie-counter"
   ],
   "author": "RaccoonCal Team",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/raccoon-cal.git"
+    "url": "https://github.com/name718/raccoon-cal-server.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/raccoon-cal/issues"
+    "url": "https://github.com/name718/raccoon-cal-server/issues"
   },
-  "homepage": "https://github.com/your-org/raccoon-cal#readme",
+  "homepage": "https://github.com/name718/raccoon-cal-server#readme",
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "eslint --fix",
