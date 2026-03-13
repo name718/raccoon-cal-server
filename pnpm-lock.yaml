@@ -95,9 +95,6 @@ importers:
       prisma:
         specifier: ^5.7.0
         version: 5.22.0
-      redis:
-        specifier: ^4.6.10
-        version: artifactory.intra.xiaojukeji.com/redis@4.7.1
       sharp:
         specifier: ^0.33.0
         version: artifactory.intra.xiaojukeji.com/sharp@0.33.5
@@ -1616,72 +1613,6 @@ packages:
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
     dev: true
 
-  artifactory.intra.xiaojukeji.com/@redis/bloom@1.2.0(@redis/client@1.6.1):
-    resolution: {integrity: sha512-HG2DFjYKbpNmVXsa0keLHp/3leGJz1mjh09f2RLGGLQZzSHpkmZWuwJbAvo3QcRY8p80m5+ZdXZdYOSBLlp7Cg==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/@redis/bloom/-/bloom-1.2.0.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2F%40redis%2Fbloom%2F-%2Fbloom-1.2.0.tgz}
-    id: artifactory.intra.xiaojukeji.com/@redis/bloom/1.2.0
-    name: '@redis/bloom'
-    version: 1.2.0
-    peerDependencies:
-      '@redis/client': ^1.0.0
-    dependencies:
-      '@redis/client': artifactory.intra.xiaojukeji.com/@redis/client@1.6.1
-    dev: false
-
-  artifactory.intra.xiaojukeji.com/@redis/client@1.6.1:
-    resolution: {integrity: sha512-/KCsg3xSlR+nCK8/8ZYSknYxvXHwubJrU82F3Lm1Fp6789VQ0/3RJKfsmRXjqfaTA++23CvC3hqmqe/2GEt6Kw==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/@redis/client/-/client-1.6.1.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2F%40redis%2Fclient%2F-%2Fclient-1.6.1.tgz}
-    name: '@redis/client'
-    version: 1.6.1
-    engines: {node: '>=14'}
-    dependencies:
-      cluster-key-slot: artifactory.intra.xiaojukeji.com/cluster-key-slot@1.1.2
-      generic-pool: artifactory.intra.xiaojukeji.com/generic-pool@3.9.0
-      yallist: artifactory.intra.xiaojukeji.com/yallist@4.0.0
-    dev: false
-
-  artifactory.intra.xiaojukeji.com/@redis/graph@1.1.1(@redis/client@1.6.1):
-    resolution: {integrity: sha512-FEMTcTHZozZciLRl6GiiIB4zGm5z5F3F6a6FZCyrfxdKOhFlGkiAqlexWMBzCi4DcRoyiOsuLfW+cjlGWyExOw==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/@redis/graph/-/graph-1.1.1.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2F%40redis%2Fgraph%2F-%2Fgraph-1.1.1.tgz}
-    id: artifactory.intra.xiaojukeji.com/@redis/graph/1.1.1
-    name: '@redis/graph'
-    version: 1.1.1
-    peerDependencies:
-      '@redis/client': ^1.0.0
-    dependencies:
-      '@redis/client': artifactory.intra.xiaojukeji.com/@redis/client@1.6.1
-    dev: false
-
-  artifactory.intra.xiaojukeji.com/@redis/json@1.0.7(@redis/client@1.6.1):
-    resolution: {integrity: sha512-6UyXfjVaTBTJtKNG4/9Z8PSpKE6XgSyEb8iwaqDcy+uKrd/DGYHTWkUdnQDyzm727V7p21WUMhsqz5oy65kPcQ==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/@redis/json/-/json-1.0.7.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2F%40redis%2Fjson%2F-%2Fjson-1.0.7.tgz}
-    id: artifactory.intra.xiaojukeji.com/@redis/json/1.0.7
-    name: '@redis/json'
-    version: 1.0.7
-    peerDependencies:
-      '@redis/client': ^1.0.0
-    dependencies:
-      '@redis/client': artifactory.intra.xiaojukeji.com/@redis/client@1.6.1
-    dev: false
-
-  artifactory.intra.xiaojukeji.com/@redis/search@1.2.0(@redis/client@1.6.1):
-    resolution: {integrity: sha512-tYoDBbtqOVigEDMAcTGsRlMycIIjwMCgD8eR2t0NANeQmgK/lvxNAvYyb6bZDD4frHRhIHkJu2TBRvB0ERkOmw==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/@redis/search/-/search-1.2.0.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2F%40redis%2Fsearch%2F-%2Fsearch-1.2.0.tgz}
-    id: artifactory.intra.xiaojukeji.com/@redis/search/1.2.0
-    name: '@redis/search'
-    version: 1.2.0
-    peerDependencies:
-      '@redis/client': ^1.0.0
-    dependencies:
-      '@redis/client': artifactory.intra.xiaojukeji.com/@redis/client@1.6.1
-    dev: false
-
-  artifactory.intra.xiaojukeji.com/@redis/time-series@1.1.0(@redis/client@1.6.1):
-    resolution: {integrity: sha512-c1Q99M5ljsIuc4YdaCwfUEXsofakb9c8+Zse2qxTadu8TalLXuAESzLvFAvNVbkmSlvlzIQOLpBCmWI9wTOt+g==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/@redis/time-series/-/time-series-1.1.0.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2F%40redis%2Ftime-series%2F-%2Ftime-series-1.1.0.tgz}
-    id: artifactory.intra.xiaojukeji.com/@redis/time-series/1.1.0
-    name: '@redis/time-series'
-    version: 1.1.0
-    peerDependencies:
-      '@redis/client': ^1.0.0
-    dependencies:
-      '@redis/client': artifactory.intra.xiaojukeji.com/@redis/client@1.6.1
-    dev: false
-
   artifactory.intra.xiaojukeji.com/@sideway/address@4.1.5:
     resolution: {integrity: sha512-IqO/DUQHUkPeixNQ8n0JA6102hT9CmaljNTPmQ1u8MEhBo/R4Q8eKLN/vGZxuebwOroDB4cbpjheD4+/sKFK4Q==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/@sideway/address/-/address-4.1.5.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2F%40sideway%2Faddress%2F-%2Faddress-4.1.5.tgz}
     name: '@sideway/address'
@@ -2803,13 +2734,6 @@ packages:
       strip-ansi: artifactory.intra.xiaojukeji.com/strip-ansi@6.0.1
       wrap-ansi: artifactory.intra.xiaojukeji.com/wrap-ansi@7.0.0
     dev: true
-
-  artifactory.intra.xiaojukeji.com/cluster-key-slot@1.1.2:
-    resolution: {integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/cluster-key-slot/-/cluster-key-slot-1.1.2.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2Fcluster-key-slot%2F-%2Fcluster-key-slot-1.1.2.tgz}
-    name: cluster-key-slot
-    version: 1.1.2
-    engines: {node: '>=0.10.0'}
-    dev: false
 
   artifactory.intra.xiaojukeji.com/co@4.6.0:
     resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/co/-/co-4.6.0.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2Fco%2F-%2Fco-4.6.0.tgz}
@@ -3947,13 +3871,6 @@ packages:
     name: generator-function
     version: 2.0.1
     engines: {node: '>= 0.4'}
-    dev: false
-
-  artifactory.intra.xiaojukeji.com/generic-pool@3.9.0:
-    resolution: {integrity: sha512-hymDOu5B53XvN4QT9dBmZxPX4CWhBPPLguTZ9MMFeFa/Kg0xWVfylOVNlJji/E7yTZWFd/q9GO5TxDLq156D7g==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/generic-pool/-/generic-pool-3.9.0.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2Fgeneric-pool%2F-%2Fgeneric-pool-3.9.0.tgz}
-    name: generic-pool
-    version: 3.9.0
-    engines: {node: '>= 4'}
     dev: false
 
   artifactory.intra.xiaojukeji.com/gensync@1.0.0-beta.2:
@@ -6298,19 +6215,6 @@ packages:
       strip-indent: artifactory.intra.xiaojukeji.com/strip-indent@3.0.0
     dev: true
 
-  artifactory.intra.xiaojukeji.com/redis@4.7.1:
-    resolution: {integrity: sha512-S1bJDnqLftzHXHP8JsT5II/CtHWQrASX5K96REjWjlmWKrviSOLWmM7QnRLstAWsu1VBBV1ffV6DzCvxNP0UJQ==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/redis/-/redis-4.7.1.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2Fredis%2F-%2Fredis-4.7.1.tgz}
-    name: redis
-    version: 4.7.1
-    dependencies:
-      '@redis/bloom': artifactory.intra.xiaojukeji.com/@redis/bloom@1.2.0(@redis/client@1.6.1)
-      '@redis/client': artifactory.intra.xiaojukeji.com/@redis/client@1.6.1
-      '@redis/graph': artifactory.intra.xiaojukeji.com/@redis/graph@1.1.1(@redis/client@1.6.1)
-      '@redis/json': artifactory.intra.xiaojukeji.com/@redis/json@1.0.7(@redis/client@1.6.1)
-      '@redis/search': artifactory.intra.xiaojukeji.com/@redis/search@1.2.0(@redis/client@1.6.1)
-      '@redis/time-series': artifactory.intra.xiaojukeji.com/@redis/time-series@1.1.0(@redis/client@1.6.1)
-    dev: false
-
   artifactory.intra.xiaojukeji.com/require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/require-directory/-/require-directory-2.1.1.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2Frequire-directory%2F-%2Frequire-directory-2.1.1.tgz}
     name: require-directory
@@ -7512,6 +7416,7 @@ packages:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/yallist/-/yallist-4.0.0.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2Fyallist%2F-%2Fyallist-4.0.0.tgz}
     name: yallist
     version: 4.0.0
+    dev: true
 
   artifactory.intra.xiaojukeji.com/yaml@2.8.2:
     resolution: {integrity: sha512-mplynKqc1C2hTVYxd0PU2xQAc22TI1vShAYGksCCfxbn/dFwnHTNi1bvYsBTkhdUNtGIf5xNOg938rrSSYvS9A==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/yaml/-/yaml-2.8.2.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2Fyaml%2F-%2Fyaml-2.8.2.tgz}

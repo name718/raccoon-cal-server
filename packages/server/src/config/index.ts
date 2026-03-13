@@ -18,11 +18,6 @@ export const config = {
       'mysql://raccoon_user:password@localhost:3306/raccoon_cal',
   },
 
-  redis: {
-    url: process.env.REDIS_URL || 'redis://localhost:6379',
-    password: process.env.REDIS_PASSWORD,
-  },
-
   jwt: {
     secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key',
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',

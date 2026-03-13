@@ -20,19 +20,6 @@ services:
     networks:
       - raccoon-cal-network
 
-  # Redis 缓存
-  redis:
-    image: redis:7-alpine
-    container_name: raccoon-cal-redis
-    restart: unless-stopped
-    ports:
-      - '6379:6379'
-    command: redis-server --appendonly yes --requirepass password
-    volumes:
-      - redis_data:/data
-    networks:
-      - raccoon-cal-network
-
   # Express 服务端
   server:
     build:
@@ -46,12 +33,10 @@ services:
       NODE_ENV: development
       PORT: 3000
       DATABASE_URL: mysql://raccoon_user:password@mysql:3306/raccoon_cal
-      REDIS_URL: redis://:password@redis:6379
       JWT_SECRET: your-super-secret-jwt-key-for-development
       JWT_EXPIRES_IN: 7d
     depends_on:
       - mysql
-      - redis
     volumes:
       - ./packages/server:/app
       - /app/node_modules
@@ -77,8 +62,6 @@ services:
 
 volumes:
   mysql_data:
-    driver: local
-  redis_data:
     driver: local
 
 networks:
