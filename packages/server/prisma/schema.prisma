@@ -18,8 +18,11 @@ model User {
   /// 用户名，唯一，用于登录和显示
   username    String   @unique @db.VarChar(50)
 
-  /// 邮箱地址，唯一，用于登录和通知
-  email       String   @unique @db.VarChar(100)
+  /// 邮箱地址，可选，用于邮箱注册和通知
+  email       String?  @unique @db.VarChar(100)
+
+  /// 手机号，可选，用于手机号注册和通知
+  phone       String?  @unique @db.VarChar(20)
 
   /// 密码哈希值，使用bcrypt加密
   passwordHash String  @map("password_hash") @db.VarChar(255)
@@ -31,7 +34,10 @@ model User {
   isActive    Boolean  @default(true) @map("is_active")
 
   /// 邮箱是否已验证，默认false
-  isVerified  Boolean  @default(false) @map("is_verified")
+  emailVerified  Boolean  @default(false) @map("email_verified")
+
+  /// 手机号是否已验证，默认false
+  phoneVerified  Boolean  @default(false) @map("phone_verified")
 
   /// 最后登录时间，可选
   lastLoginAt DateTime? @map("last_login_at")
@@ -44,6 +50,7 @@ model User {
 
   @@map("users")
   @@index([email])
+  @@index([phone])
   @@index([username])
   @@index([isActive])
   @@index([createdAt])

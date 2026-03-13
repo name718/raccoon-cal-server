@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>验证码测试</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .captcha-container {
+      margin: 20px 0;
+    }
+
+    .captcha-image {
+      border: 1px solid #ccc;
+      margin: 10px 0;
+    }
+
+    input,
+    button {
+      padding: 8px;
+      margin: 5px;
+    }
+
+    .result {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>浣熊卡路里 - 验证码测试</h1>
+
+  <div class="captcha-container">
+    <button onclick="generateCaptcha()">生成验证码</button>
+    <div id="captcha-display"></div>
+    <input type="text" id="captcha-input" placeholder="请输入验证码" maxlength="4">
+    <button onclick="verifyCaptcha()">验证</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    let currentCaptchaId = null;
+
+    async function generateCaptcha() {
+      try {
+        const response = await fetch('http://localhost:3000/api/captcha/generate');
+        const data = await response.json();
+
+        if (data.success) {
+          currentCaptchaId = data.data.captchaId;
+          document.getElementById('captcha-display').innerHTML =
+            `<img src="${data.data.captchaImage}" class="captcha-image" alt="验证码">`;
+          document.getElementById('captcha-input').value = '';
+          document.getElementById('result').innerHTML = '';
+        } else {
+          showResult('生成验证码失败', 'error');
+        }
+      } catch (error) {
+        showResult('网络错误: ' + error.message, 'error');
+      }
+    }
+
+    async function verifyCaptcha() {
+      if (!currentCaptchaId) {
+        showResult('请先生成验证码', 'error');
+        return;
+      }
+
+      const captchaCode = document.getElementById('captcha-input').value;
+      if (!captchaCode) {
+        showResult('请输入验证码', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/api/captcha/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            captchaId: currentCaptchaId,
+            captchaCode: captchaCode
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showResult('验证码验证成功！', 'success');
+        } else {
+          showResult(data.error.message, 'error');
+        }
+      } catch (error) {
+        showResult('网络错误: ' + error.message, 'error');
+      }
+    }
+
+    function showResult(message, type) {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = message;
+      resultDiv.className = 'result ' + type;
+    }
+
+    // 页面加载时自动生成一个验证码
+    window.onload = function () {
+      generateCaptcha();
+    };
+  </script>
+</body>
+
+</html>

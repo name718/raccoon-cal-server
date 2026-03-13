@@ -49,6 +49,12 @@ app.get('/health', async (req, res) => {
 });
 
 // API 路由
+import authRoutes from '@/routes/auth.routes';
+import captchaRoutes from '@/routes/captcha.routes';
+
+app.use('/api/auth', authRoutes);
+app.use('/api/captcha', captchaRoutes);
+
 app.use('/api', (req, res) => {
   res.status(200).json({
     message: 'Raccoon Cal Server API',

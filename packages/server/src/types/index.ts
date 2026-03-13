@@ -1,4 +1,6 @@
-export interface ApiResponse<T = any> {
+import type { Request } from 'express';
+
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: {
@@ -35,16 +37,15 @@ export interface JwtPayload {
 }
 
 export interface AuthenticatedRequest extends Request {
-  user?: JwtPayload;
+  user?: {
+    id: number;
+    username: string;
+    email?: string | null;
+    phone?: string | null;
+    emailVerified: boolean;
+    phoneVerified: boolean;
+  };
 }
 
 // 重新导出 Prisma 类型
-export type {
-  User,
-  FoodRecord,
-  Pet,
-  Task,
-  Friendship,
-  TaskType,
-  FriendshipStatus,
-} from '@prisma/client';
+export type { User } from '@prisma/client';

@@ -101,6 +101,12 @@ importers:
       socket.io:
         specifier: ^4.7.4
         version: artifactory.intra.xiaojukeji.com/socket.io@4.8.3
+      svg-captcha:
+        specifier: ^1.4.0
+        version: 1.4.0
+      uuid:
+        specifier: ^13.0.0
+        version: 13.0.0
       winston:
         specifier: ^3.11.0
         version: artifactory.intra.xiaojukeji.com/winston@3.19.0
@@ -126,6 +132,9 @@ importers:
       '@types/node':
         specifier: ^20.10.0
         version: artifactory.intra.xiaojukeji.com/@types/node@20.19.37
+      '@types/uuid':
+        specifier: ^11.0.0
+        version: 11.0.0
       nodemon:
         specifier: ^3.0.2
         version: artifactory.intra.xiaojukeji.com/nodemon@3.1.14
@@ -434,6 +443,13 @@ packages:
       undici-types: 6.21.0
     dev: true
 
+  /@types/uuid@11.0.0:
+    resolution: {integrity: sha512-HVyk8nj2m+jcFRNazzqyVKiZezyhDKrGUA3jlEcg/nZ6Ms+qHwocba1Y/AaVaznJTAM9xpdFSh+ptbNrhOGvZA==}
+    deprecated: This is a stub types definition. uuid provides its own type definitions, so you do not need this installed.
+    dependencies:
+      uuid: 13.0.0
+    dev: true
+
   /acorn-walk@8.3.5:
     resolution: {integrity: sha512-HEHNfbars9v4pgpW6SO1KSPkfoS0xVOM/9UzkJltjlsHZmJasxg8aXkuZa7SMf8vKGIBhpUsPluQSqhJFCqebw==}
     engines: {node: '>=0.4.0'}
@@ -481,6 +497,13 @@ packages:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
     dev: true
 
+  /opentype.js@0.7.3:
+    resolution: {integrity: sha512-Veui5vl2bLonFJ/SjX/WRWJT3SncgiZNnKUyahmXCc2sa1xXW15u3R/3TN5+JFiP7RsjK5ER4HA5eWaEmV9deA==}
+    hasBin: true
+    dependencies:
+      tiny-inflate: 1.0.3
+    dev: false
+
   /prisma@5.22.0:
     resolution: {integrity: sha512-vtpjW3XuYCSnMsNVBjLMNkTj6OZbudcPPTPYHqX0CJfpcdWciI1dM8uHETwmDxxiqEwCIE6WvXucWUetJgfu/A==}
     engines: {node: '>=16.13'}
@@ -496,6 +519,17 @@ packages:
     resolution: {integrity: sha512-vavAMRXOgBVNF6nyEEmL3DBK19iRpDcoIwW+swQ+CbGiu7lju6t+JklA1MHweoWtadgt4ISVUsXLyDq34ddcwA==}
     engines: {node: '>=4'}
     dev: true
+
+  /svg-captcha@1.4.0:
+    resolution: {integrity: sha512-/fkkhavXPE57zRRCjNqAP3txRCSncpMx3NnNZL7iEoyAtYwUjPhJxW6FQTQPG5UPEmCrbFoXS10C3YdJlW7PDg==}
+    engines: {node: '>=4.x'}
+    dependencies:
+      opentype.js: 0.7.3
+    dev: false
+
+  /tiny-inflate@1.0.3:
+    resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
+    dev: false
 
   /ts-node@10.9.2(@types/node@20.19.37)(typescript@5.9.3):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
@@ -554,6 +588,20 @@ packages:
   /undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
     dev: true
+
+  /uuid@13.0.0:
+    resolution: {integrity: sha512-XQegIaBTVUjSHliKqcnFqYypAd4S+WCYt5NIeRs6w/UAry7z8Y9j5ZwRRL4kzq9U3sD6v+85er9FvkEaBpji2w==}
+    hasBin: true
+
+  /uuid@8.0.0:
+    resolution: {integrity: sha512-jOXGuXZAWdsTH7eZLtyXMqUb9EcWMGZNbL9YcGBJl4MH4nrxHmZJhEHvyLFrkxo+28uLb/NYRcStH48fnD0Vzw==}
+    hasBin: true
+    dev: false
+
+  /uuid@8.3.2:
+    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    hasBin: true
+    dev: false
 
   /v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
@@ -2305,7 +2353,7 @@ packages:
       sax: artifactory.intra.xiaojukeji.com/sax@1.2.1
       url: artifactory.intra.xiaojukeji.com/url@0.10.3
       util: artifactory.intra.xiaojukeji.com/util@0.12.5
-      uuid: artifactory.intra.xiaojukeji.com/uuid@8.0.0
+      uuid: 8.0.0
       xml2js: artifactory.intra.xiaojukeji.com/xml2js@0.6.2
     dev: false
 
@@ -5671,7 +5719,7 @@ packages:
     version: 3.0.3
     engines: {node: '>=6.0.0'}
     dependencies:
-      uuid: artifactory.intra.xiaojukeji.com/uuid@8.3.2
+      uuid: 8.3.2
     dev: false
 
   artifactory.intra.xiaojukeji.com/node-int64@0.4.0:
@@ -7196,20 +7244,6 @@ packages:
     name: utils-merge
     version: 1.0.1
     engines: {node: '>= 0.4.0'}
-    dev: false
-
-  artifactory.intra.xiaojukeji.com/uuid@8.0.0:
-    resolution: {integrity: sha512-jOXGuXZAWdsTH7eZLtyXMqUb9EcWMGZNbL9YcGBJl4MH4nrxHmZJhEHvyLFrkxo+28uLb/NYRcStH48fnD0Vzw==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/uuid/-/uuid-8.0.0.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2Fuuid%2F-%2Fuuid-8.0.0.tgz}
-    name: uuid
-    version: 8.0.0
-    hasBin: true
-    dev: false
-
-  artifactory.intra.xiaojukeji.com/uuid@8.3.2:
-    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==, registry: https://registry.npmjs.org/, tarball: http://artifactory.intra.xiaojukeji.com/artifactory/api/npm/npm/uuid/-/uuid-8.3.2.tgz?dl=https%3A%2F%2Fregistry.npmmirror.com%2Fuuid%2F-%2Fuuid-8.3.2.tgz}
-    name: uuid
-    version: 8.3.2
-    hasBin: true
     dev: false
 
   artifactory.intra.xiaojukeji.com/v8-to-istanbul@9.3.0:
