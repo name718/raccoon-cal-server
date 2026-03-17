@@ -52,10 +52,12 @@ app.get('/health', async (req, res) => {
 import authRoutes from '@/routes/auth.routes';
 import captchaRoutes from '@/routes/captcha.routes';
 import foodRoutes from '@/routes/food.routes';
+import gamificationRoutes from '@/routes/gamification.routes';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/captcha', captchaRoutes);
 app.use('/api/food', foodRoutes);
+app.use('/api/gamification', gamificationRoutes);
 
 app.use('/api', (req, res) => {
   res.status(200).json({
