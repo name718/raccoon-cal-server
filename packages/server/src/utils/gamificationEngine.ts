@@ -228,8 +228,10 @@ export async function awardXp(
   });
 
   if (leagueMember) {
-    const rankingKey = `league:ranking:${leagueMember.league.tier}:${leagueMember.league.weekStart}`;
+    const rankingKey = `league:${leagueMember.leagueId}:weekly_xp`;
     await redis.zincrby(rankingKey, amount, String(userId)).catch(() => null);
+    // 确保 TTL 存在（7 天）
+    await redis.expire(rankingKey, 7 * 24 * 60 * 60).catch(() => null);
   }
 
   // 失效游戏化状态缓存

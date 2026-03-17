@@ -56,6 +56,7 @@ import gamificationRoutes from '@/routes/gamification.routes';
 import petRoutes from '@/routes/pet.routes';
 import taskRoutes from '@/routes/task.routes';
 import achievementRoutes from '@/routes/achievement.routes';
+import leagueRoutes from '@/routes/league.routes';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/captcha', captchaRoutes);
@@ -64,6 +65,7 @@ app.use('/api/gamification', gamificationRoutes);
 app.use('/api/pet', petRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/achievements', achievementRoutes);
+app.use('/api/league', leagueRoutes);
 
 app.use('/api', (req, res) => {
   res.status(200).json({
