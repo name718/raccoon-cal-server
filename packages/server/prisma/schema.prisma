@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 /// 用户表 - 存储用户基本信息和账户状态
@@ -48,10 +47,358 @@ model User {
   /// 更新时间，自动更新
   updatedAt   DateTime @updatedAt @map("updated_at")
 
+  /// 用户健康档案关联
+  profile     UserProfile?
+
+  /// 体重历史记录关联
+  weightRecords WeightRecord[]
+
+  /// 饮食记录关联
+  foodRecords   FoodRecord[]
+
+  /// 游戏化状态关联
+  gamificationStatus GamificationStatus?
+
+  /// XP 流水记录关联
+  xpTransactions XpTransaction[]
+
+  /// 浣熊宠物关联
+  pet            Pet?
+
+  /// 每日任务关联
+  dailyTasks     DailyTask[]
+
+  /// 已解锁成就关联
+  userAchievements UserAchievement[]
+
+  /// 联盟成员关联
+  leagueMembers    LeagueMember[]
+
   @@map("users")
   @@index([email])
   @@index([phone])
   @@index([username])
   @@index([isActive])
   @@index([createdAt])
+}
+
+/// 用户健康档案 - 存储 Onboarding 收集的身体数据和健康目标
+model UserProfile {
+  /// 档案ID，主键，自增
+  id              Int      @id @default(autoincrement())
+
+  /// 关联用户ID，唯一（一对一）
+  userId          Int      @unique @map("user_id")
+
+  /// 昵称
+  nickname        String   @db.VarChar(50)
+
+  /// 性别（male / female / other）
+  gender          String   @db.VarChar(10)
+
+  /// 身高，单位 cm
+  height          Int
+
+  /// 体重，单位 kg
+  weight          Float
+
+  /// 年龄
+  age             Int
+
+  /// 健康目标（lose_weight / maintain / gain_muscle）
+  goal            String   @db.VarChar(50)
+
+  /// 活动水平（sedentary / light / moderate / active / very_active）
+  activityLevel   String   @map("activity_level") @db.VarChar(20)
+
+  /// 每日卡路里目标，由 Harris-Benedict 公式计算
+  dailyCalTarget  Int      @map("daily_cal_target")
+
+  /// 创建时间
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  /// 更新时间，自动更新
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@map("user_profiles")
+}
+
+/// 体重历史 - 记录用户每次体重变化
+model WeightRecord {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  weight     Float
+  recordedAt DateTime @default(now()) @map("recorded_at")
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@map("weight_records")
+  @@index([userId, recordedAt])
+}
+
+/// 饮食记录 - 记录用户每次饮食，含餐次/营养素/图片URL
+model FoodRecord {
+  /// 记录ID，主键，自增
+  id          Int      @id @default(autoincrement())
+
+  /// 关联用户ID
+  userId      Int      @map("user_id")
+
+  /// 食物名称
+  foodName    String   @map("food_name") @db.VarChar(100)
+
+  /// 卡路里（kcal）
+  calories    Float
+
+  /// 蛋白质（克），默认 0
+  protein     Float    @default(0)
+
+  /// 脂肪（克），默认 0
+  fat         Float    @default(0)
+
+  /// 碳水化合物（克），默认 0
+  carbs       Float    @default(0)
+
+  /// 膳食纤维（克），默认 0
+  fiber       Float    @default(0)
+
+  /// 份量（克），默认 100
+  servingSize Float    @default(100) @map("serving_size")
+
+  /// 餐次类型：breakfast / lunch / dinner / snack
+  mealType    String   @map("meal_type") @db.VarChar(20)
+
+  /// 食物图片URL，可选（LogMeal 识别时上传的图片）
+  imageUrl    String?  @map("image_url") @db.VarChar(255)
+
+  /// 记录时间，默认当前时间
+  recordedAt  DateTime @default(now()) @map("recorded_at")
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("food_records")
+  @@index([userId, recordedAt])
+}
+
+/// 游戏化状态（每用户一条）- 存储 XP/等级/HP/Streak/保护盾
+model GamificationStatus {
+  /// 记录ID，主键，自增
+  id            Int       @id @default(autoincrement())
+
+  /// 关联用户ID，唯一（一对一）
+  userId        Int       @unique @map("user_id")
+
+  /// 累计总 XP
+  totalXp       Int       @default(0) @map("total_xp")
+
+  /// 当前等级（由 totalXp 计算，冗余存储以提升查询性能）
+  level         Int       @default(1)
+
+  /// 本周 XP（每周日结算后重置）
+  weeklyXp      Int       @default(0) @map("weekly_xp")
+
+  /// 当前生命值（0-5，每日零点重置为 5）
+  currentHp     Int       @default(5) @map("current_hp")
+
+  /// 连续打卡天数
+  streakDays    Int       @default(0) @map("streak_days")
+
+  /// Streak 保护盾数量（最多 2 个）
+  streakShields Int       @default(0) @map("streak_shields")
+
+  /// 最后打卡时间
+  lastCheckinAt DateTime? @map("last_checkin_at")
+
+  /// HP 最后重置时间
+  hpResetAt     DateTime? @map("hp_reset_at")
+
+  /// 更新时间，自动更新
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  user          User      @relation(fields: [userId], references: [id])
+
+  @@map("gamification_status")
+}
+
+/// 浣熊宠物（每用户一条）- 存储宠物状态和装扮槽位
+model Pet {
+  /// 宠物ID，主键，自增
+  id          Int      @id @default(autoincrement())
+
+  /// 关联用户ID，唯一（一对一）
+  userId      Int      @unique @map("user_id")
+
+  /// 宠物名称，默认"小R"
+  name        String   @default("小R") @db.VarChar(50)
+
+  /// 饱食度（0-100），每日零点重置为 0
+  satiety     Float    @default(0)
+
+  /// 帽子装扮槽位，存储装扮 key，可选
+  hatSlot     String?  @map("hat_slot") @db.VarChar(50)
+
+  /// 衣服装扮槽位，存储装扮 key，可选
+  clothSlot   String?  @map("cloth_slot") @db.VarChar(50)
+
+  /// 配件装扮槽位，存储装扮 key，可选
+  accessSlot  String?  @map("access_slot") @db.VarChar(50)
+
+  /// 更新时间，自动更新
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user         User             @relation(fields: [userId], references: [id])
+  levelHistory PetLevelHistory[]
+
+  @@map("pets")
+}
+
+/// 浣熊升级历史 - 记录每次升级事件和解锁内容
+model PetLevelHistory {
+  /// 记录ID，主键，自增
+  id           Int      @id @default(autoincrement())
+
+  /// 关联宠物ID
+  petId        Int      @map("pet_id")
+
+  /// 升级后的等级
+  level        Int
+
+  /// 升级解锁的道具 key，可选（3D 装扮道具暂缓，预留字段）
+  unlockedItem String?  @map("unlocked_item") @db.VarChar(100)
+
+  /// 升级时间
+  achievedAt   DateTime @default(now()) @map("achieved_at")
+
+  pet          Pet      @relation(fields: [petId], references: [id])
+
+  @@map("pet_level_history")
+  @@index([petId, achievedAt])
+}
+
+/// XP 流水记录 - 记录每次 XP 授予，含幂等唯一约束
+model XpTransaction {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  amount    Int
+  reason    String   @db.VarChar(50) // food_record / daily_goal / task / streak / achievement
+  refId     String?  @map("ref_id") @db.VarChar(50) // 关联业务 ID，用于幂等
+  earnedAt  DateTime @default(now()) @map("earned_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("xp_transactions")
+  @@unique([userId, reason, refId]) // 幂等约束
+  @@index([userId, earnedAt])
+}
+
+/// 每日任务 - 记录用户每日任务状态，含唯一约束防止重复生成
+model DailyTask {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  taskKey     String    @map("task_key") @db.VarChar(50)
+  title       String    @db.VarChar(100)
+  xpReward    Int       @map("xp_reward")
+  completed   Boolean   @default(false)
+  completedAt DateTime? @map("completed_at")
+  taskDate    String    @map("task_date") @db.VarChar(10) // YYYY-MM-DD
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@map("daily_tasks")
+  @@unique([userId, taskKey, taskDate])
+  @@index([userId, taskDate])
+}
+
+/// 成就徽章定义（静态数据，seed 写入）
+model AchievementDef {
+  /// 记录ID，主键，自增
+  id          Int      @id @default(autoincrement())
+
+  /// 成就唯一标识 key
+  key         String   @unique @db.VarChar(50)
+
+  /// 成就标题
+  title       String   @db.VarChar(100)
+
+  /// 成就描述
+  description String   @db.VarChar(255)
+
+  /// 解锁奖励 XP
+  xpReward    Int      @map("xp_reward")
+
+  /// 图标名称（对应 Assets 中的图片 key）
+  iconName    String   @map("icon_name") @db.VarChar(50)
+
+  /// 关联的用户解锁记录
+  userAchievements UserAchievement[]
+
+  @@map("achievement_defs")
+}
+
+/// 用户已解锁成就 - 记录用户解锁的成就，含幂等唯一约束
+model UserAchievement {
+  /// 记录ID，主键，自增
+  id              Int      @id @default(autoincrement())
+
+  /// 关联用户ID
+  userId          Int      @map("user_id")
+
+  /// 成就 key，关联 AchievementDef
+  achievementKey  String   @map("achievement_key") @db.VarChar(50)
+
+  /// 解锁时间
+  unlockedAt      DateTime @default(now()) @map("unlocked_at")
+
+  user            User     @relation(fields: [userId], references: [id])
+  achievementDef  AchievementDef @relation(fields: [achievementKey], references: [key])
+
+  @@unique([userId, achievementKey])
+  @@map("user_achievements")
+  @@index([userId, unlockedAt])
+}
+
+/// 联盟分组 - 按层级和周次分组的联盟
+model League {
+  /// 联盟ID，主键，自增
+  id        Int      @id @default(autoincrement())
+
+  /// 联盟层级（bronze / silver / gold / platinum / diamond）
+  tier      String   @db.VarChar(20)
+
+  /// 本周开始日期（YYYY-MM-DD）
+  weekStart String   @map("week_start") @db.VarChar(10)
+
+  /// 联盟成员关联
+  members   LeagueMember[]
+
+  @@map("leagues")
+  @@index([tier, weekStart])
+}
+
+/// 联盟成员 - 记录用户在某联盟的本周 XP 和排名
+model LeagueMember {
+  /// 记录ID，主键，自增
+  id        Int      @id @default(autoincrement())
+
+  /// 关联联盟ID
+  leagueId  Int      @map("league_id")
+
+  /// 关联用户ID
+  userId    Int      @map("user_id")
+
+  /// 本周 XP，默认 0
+  weeklyXp  Int      @default(0) @map("weekly_xp")
+
+  /// 排名，结算后写入，可选
+  rank      Int?
+
+  /// 结算后晋升/降级标记，可选（true=晋升，false=降级，null=保持）
+  promoted  Boolean?
+
+  league    League   @relation(fields: [leagueId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([leagueId, userId])
+  @@map("league_members")
+  @@index([leagueId, weeklyXp])
+  @@index([userId])
 }
