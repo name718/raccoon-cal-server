@@ -90,6 +90,15 @@ async function startServer() {
     // 连接数据库
     await database.connect();
 
+    // 注册定时任务
+    const { registerDailyResetJob } = await import('@/jobs/dailyReset.job');
+    const { registerLeagueSettlementJob } =
+      await import('@/jobs/leagueSettlement.job');
+    const { registerStreakCheckJob } = await import('@/jobs/streakCheck.job');
+    registerDailyResetJob();
+    registerLeagueSettlementJob();
+    registerStreakCheckJob();
+
     // 启动 HTTP 服务器
     app.listen(PORT, HOST, () => {
       logger.info(`Server is running on http://${HOST}:${PORT}`);
