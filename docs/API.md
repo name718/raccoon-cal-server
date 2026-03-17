@@ -2,10 +2,9 @@
 
 ## 基础信息
 
-- **Base URL**: `http://localhost:3000/api`
-- **认证方式**: Bearer Token (JWT)
-- **请求格式**: JSON
-- **响应格式**: JSON
+- Base URL（开发）：`http://localhost:3000/api`
+- 认证方式：`Authorization: Bearer <JWT token>`
+- 请求/响应格式：JSON
 
 ## 通用响应格式
 
@@ -14,339 +13,450 @@ interface APIResponse<T> {
   success: boolean;
   message?: string;
   data?: T;
-  error?: {
-    code: string;
-    message: string;
-    details?: any;
-  };
+  error?: { code: string; message: string; details?: any };
   timestamp: string;
 }
 ```
 
-## 错误码说明
+## 错误码
 
-| 错误码                | HTTP状态码 | 说明             |
-| --------------------- | ---------- | ---------------- |
-| `AUTH_REQUIRED`       | 401        | 需要登录认证     |
-| `INVALID_TOKEN`       | 401        | Token无效或过期  |
-| `PERMISSION_DENIED`   | 403        | 权限不足         |
-| `NOT_FOUND`           | 404        | 资源不存在       |
-| `VALIDATION_ERROR`    | 400        | 请求参数验证失败 |
-| `RATE_LIMIT_EXCEEDED` | 429        | 请求频率超限     |
-| `INTERNAL_ERROR`      | 500        | 服务器内部错误   |
+| 错误码                | HTTP | 说明             |
+| --------------------- | ---- | ---------------- |
+| `AUTH_REQUIRED`       | 401  | 未提供 Token     |
+| `INVALID_TOKEN`       | 401  | Token 无效或过期 |
+| `PERMISSION_DENIED`   | 403  | 权限不足         |
+| `NOT_FOUND`           | 404  | 资源不存在       |
+| `VALIDATION_ERROR`    | 400  | 参数验证失败     |
+| `RATE_LIMIT_EXCEEDED` | 429  | 请求频率超限     |
+| `INVALID_CAPTCHA`     | 400  | 验证码错误或过期 |
+| `AI_TIMEOUT`          | 503  | 食物识别服务超时 |
+| `INVALID_IMAGE`       | 400  | 图片格式不支持   |
+| `INTERNAL_ERROR`      | 500  | 服务器内部错误   |
 
-## 1. 认证接口
+---
 
-### 1.1 用户注册
+## 1. 验证码
 
-**接口地址**: `POST /auth/register`
+### 生成验证码
 
-**请求参数**:
-
-```json
-{
-  "username": "testuser", // 必填，用户名，3-20个字符，只能包含字母和数字
-  "password": "123456", // 必填，密码，6-50个字符
-  "email": "user@example.com", // 可选，邮箱地址
-  "phone": "13800138000" // 可选，手机号，但email和phone至少提供一个
-}
-```
-
-**响应示例**:
+`GET /captcha/generate`
 
 ```json
 {
-  "success": true,
-  "message": "注册成功",
   "data": {
-    "user": {
-      "id": 1,
-      "username": "testuser",
-      "email": "user@example.com",
-      "phone": "13800138000",
-      "createdAt": "2026-03-13T08:31:49.000Z"
-    },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  },
-  "timestamp": "2026-03-13T08:31:49.123Z"
+    "captchaId": "uuid",
+    "captchaImage": "data:image/svg+xml;base64,..."
+  }
 }
 ```
 
-### 1.2 用户登录
+验证码有效期 5 分钟，4 位字符，排除易混淆字符（0oO1iIl）。
 
-**接口地址**: `POST /auth/login`
+### 验证验证码
 
-**请求参数**:
+`POST /captcha/verify`
 
 ```json
-{
-  "identifier": "testuser", // 必填，可以是用户名、邮箱或手机号
-  "password": "123456" // 必填，密码
-}
+// 请求
+{ "captchaId": "uuid", "captchaCode": "abcd" }
+
+// 成功响应
+{ "data": { "valid": true } }
 ```
 
-**响应示例**:
+---
+
+## 2. 认证
+
+### 注册
+
+`POST /auth/register`
 
 ```json
+// 请求（email 和 phone 至少提供一个）
 {
-  "success": true,
-  "message": "登录成功",
+  "username": "testuser",
+  "password": "123456",
+  "email": "user@example.com",
+  "phone": "13800138000"
+}
+
+// 响应
+{
   "data": {
-    "user": {
-      "id": 1,
-      "username": "testuser",
-      "email": "user@example.com",
-      "phone": "13800138000",
-      "emailVerified": false,
-      "phoneVerified": false
-    },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  },
-  "timestamp": "2026-03-13T08:31:49.123Z"
+    "user": { "id": 1, "username": "testuser", "email": "user@example.com" },
+    "token": "eyJ..."
+  }
 }
 ```
 
-### 1.3 检查登录状态 / 获取当前用户信息
+### 登录
 
-**接口地址**: `GET /auth/me`
+`POST /auth/login`
 
-**请求头**:
+```json
+// 请求（identifier 可以是用户名/邮箱/手机号）
+{ "identifier": "testuser", "password": "123456" }
 
+// 响应
+{
+  "data": {
+    "user": { "id": 1, "username": "testuser", "emailVerified": false },
+    "token": "eyJ..."
+  }
+}
 ```
-Authorization: Bearer <token>
-```
 
-**成功响应**:
+### 获取当前用户
+
+`GET /auth/me` 🔒
 
 ```json
 {
-  "success": true,
-  "message": "获取用户信息成功",
   "data": {
-    "user": {
-      "id": 1,
-      "username": "testuser",
-      "email": "user@example.com",
-      "phone": "13800138000",
-      "emailVerified": false,
-      "phoneVerified": false
+    "user": { "id": 1, "username": "testuser", "email": "user@example.com" }
+  }
+}
+```
+
+---
+
+## 3. 食物识别与记录 🔒
+
+### 识别食物
+
+`POST /food/recognize`
+
+请求格式：`multipart/form-data`，字段名 `image`，支持 jpg/png/webp。
+
+```json
+// 响应
+{
+  "data": {
+    "foods": [
+      {
+        "name": "炒饭",
+        "calories": 350.0,
+        "protein": 8.5,
+        "fat": 12.0,
+        "carbs": 52.0,
+        "servingSize": 200.0
+      }
+    ],
+    "confidence": 0.87
+  }
+}
+```
+
+识别失败（置信度 < 0.3）返回 `{ "foods": [], "confidence": 0 }`，不报错。
+
+### 保存饮食记录
+
+`POST /food/records`
+
+```json
+// 请求
+{
+  "foodName": "炒饭",
+  "calories": 350.0,
+  "protein": 8.5,
+  "fat": 12.0,
+  "carbs": 52.0,
+  "servingSize": 200.0,
+  "mealType": "lunch",
+  "imageUrl": "https://..."
+}
+// mealType: breakfast | lunch | dinner | snack
+```
+
+保存成功后自动触发：XP +10、HP 检查、浣熊饱食度更新、打卡标记。
+
+### 获取饮食记录
+
+`GET /food/records?date=2026-03-17`
+
+```json
+{
+  "data": [
+    {
+      "mealType": "lunch",
+      "totalCalories": 350.0,
+      "records": [
+        {
+          "id": 1,
+          "foodName": "炒饭",
+          "calories": 350.0,
+          "recordedAt": "2026-03-17T12:00:00Z"
+        }
+      ]
     }
-  },
-  "timestamp": "2026-03-13T08:31:49.123Z"
+  ]
 }
 ```
 
-**未登录响应**:
+### 删除饮食记录
+
+`DELETE /food/records/:id`
+
+### 营养统计
+
+`GET /food/stats?days=7`
 
 ```json
 {
-  "success": false,
-  "error": {
-    "code": "AUTH_REQUIRED",
-    "message": "需要登录认证"
-  },
-  "timestamp": "2026-03-13T08:51:38.555Z"
-}
-```
-
-**Token无效响应**:
-
-```json
-{
-  "success": false,
-  "error": {
-    "code": "INVALID_TOKEN",
-    "message": "Token无效或已过期"
-  },
-  "timestamp": "2026-03-13T08:51:38.555Z"
-}
-```
-
-**说明**:
-
-- 此接口可用于检查用户是否已登录
-- 前端可以在应用启动时调用此接口验证本地存储的token是否有效
-- 如果token有效，返回用户信息；如果无效或过期，返回相应错误
-
-## 2. 验证码接口
-
-### 2.1 生成图形验证码
-
-**接口地址**: `GET /captcha/generate`
-
-**响应示例**:
-
-```json
-{
-  "success": true,
-  "message": "验证码生成成功",
   "data": {
-    "captchaId": "35f4ff8f-d514-400e-8296-fc21afe46b5f",
-    "captchaImage": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAsMCwxMjAsNDAiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNmMGYwZjAiLz48L3N2Zz4="
-  },
-  "timestamp": "2026-03-13T08:38:08.713Z"
+    "dailyCalories": [{ "date": "2026-03-17", "calories": 1850.0 }],
+    "avgProtein": 65.2,
+    "avgFat": 58.1,
+    "avgCarbs": 220.5
+  }
 }
 ```
 
-**说明**:
+---
 
-- `captchaId`: 验证码唯一标识，用于后续验证
-- `captchaImage`: Base64编码的SVG图片，可直接在前端显示
-- 验证码有效期为5分钟
-- 验证码为4位字符，忽略容易混淆的字符（0o1iIl）
+## 4. 游戏化状态 🔒
 
-### 2.2 验证图形验证码
+### 获取游戏化状态
 
-**接口地址**: `POST /captcha/verify`
-
-**请求参数**:
+`GET /gamification/status`
 
 ```json
 {
-  "captchaId": "35f4ff8f-d514-400e-8296-fc21afe46b5f", // 必填，验证码ID
-  "captchaCode": "abcd" // 必填，用户输入的验证码
-}
-```
-
-**成功响应**:
-
-```json
-{
-  "success": true,
-  "message": "验证码验证成功",
   "data": {
-    "valid": true
-  },
-  "timestamp": "2026-03-13T08:38:16.920Z"
+    "totalXp": 1250,
+    "level": 3,
+    "weeklyXp": 180,
+    "currentHp": 4,
+    "streakDays": 7,
+    "streakShields": 1,
+    "xpToNextLevel": 350,
+    "levelProgress": 0.78
+  }
 }
 ```
 
-**失败响应**:
+### 获取 XP 历史
+
+`GET /gamification/history`
+
+---
+
+## 5. 浣熊宠物 🔒
+
+### 获取浣熊状态
+
+`GET /pet`
 
 ```json
 {
-  "success": false,
-  "error": {
-    "code": "INVALID_CAPTCHA",
-    "message": "验证码错误或已过期"
-  },
-  "timestamp": "2026-03-13T08:38:16.920Z"
-}
-```
-
-### 2.3 获取验证码统计
-
-**接口地址**: `GET /captcha/stats`
-
-**响应示例**:
-
-```json
-{
-  "success": true,
-  "message": "获取验证码统计成功",
   "data": {
-    "activeCaptchas": 0,
-    "timestamp": "2026-03-13T08:38:23.667Z"
-  },
-  "timestamp": "2026-03-13T08:38:23.667Z"
+    "name": "小R",
+    "level": 3,
+    "satiety": 65.0,
+    "mood": "happy",
+    "hatSlot": null,
+    "clothSlot": null,
+    "accessSlot": null,
+    "unlockedOutfits": [],
+    "levelHistory": [
+      { "level": 2, "unlockedItem": null, "achievedAt": "2026-03-10T00:00:00Z" }
+    ]
+  }
 }
 ```
 
-## 3. 用户接口
+mood 枚举：`happy | satisfied | normal | hungry | sad | missing`
 
-待开发...
+### 触发互动
 
-## 3. 食物识别接口
+`POST /pet/interact`
 
-待开发...
+每日一次，+XP（幂等）。
 
-## 4. 浣熊养成接口
+### 更换装扮
 
-待开发...
+`PUT /pet/outfit`
 
-## 5. 社交功能接口
+```json
+// 请求（null 表示清空该槽位）
+{ "hatSlot": "hat_001", "clothSlot": null, "accessSlot": null }
+```
 
-待开发...
+### 获取已解锁装扮
 
-## 6. 数据统计接口
+`GET /pet/outfits`
 
-待开发...
+---
 
-## 7. 通知接口
+## 6. 每日任务 🔒
 
-待开发...
+### 获取今日任务
 
-## 8. 系统接口
+`GET /tasks/daily`
 
-### 8.1 健康检查
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "taskKey": "record_breakfast",
+      "title": "记录早餐",
+      "xpReward": 20,
+      "completed": false
+    },
+    {
+      "id": 2,
+      "taskKey": "record_three_meals",
+      "title": "记录三餐",
+      "xpReward": 30,
+      "completed": false
+    },
+    {
+      "id": 3,
+      "taskKey": "interact_pet",
+      "title": "与浣熊互动",
+      "xpReward": 15,
+      "completed": true
+    }
+  ]
+}
+```
 
-**接口地址**: `GET /health`
+若当日无任务则自动生成（从任务池随机抽 3 条，不重复）。
 
-**响应示例**:
+### 触发任务完成检查
+
+`POST /tasks/:id/complete`
+
+---
+
+## 7. 成就徽章 🔒
+
+### 获取全部成就
+
+`GET /achievements`
+
+```json
+{
+  "data": [
+    {
+      "key": "streak_7",
+      "title": "连续打卡 7 天",
+      "description": "坚持记录 7 天",
+      "xpReward": 50,
+      "iconName": "streak_7",
+      "unlocked": true,
+      "unlockedAt": "2026-03-15T00:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
+## 8. 联盟排行榜 🔒
+
+### 获取当前联盟
+
+`GET /league/current`
+
+```json
+{
+  "data": {
+    "tier": "bronze",
+    "weeklyXp": 180,
+    "rank": 5,
+    "topMembers": [
+      {
+        "nickname": "用户A",
+        "petAvatarMood": "happy",
+        "weeklyXp": 420,
+        "rank": 1
+      }
+    ]
+  }
+}
+```
+
+tier 枚举：`bronze | silver | gold | platinum | diamond`
+
+### 获取上次结算结果
+
+`GET /league/settlement`
+
+```json
+{
+  "data": {
+    "promoted": true,
+    "demoted": false,
+    "newTier": "silver",
+    "finalRank": 3
+  }
+}
+```
+
+---
+
+## 9. 个人资料 🔒
+
+### 获取个人资料
+
+`GET /profile`
+
+### 更新个人资料
+
+`PUT /profile`
+
+```json
+// 请求（所有字段可选）
+{
+  "nickname": "浣熊爱好者",
+  "height": 170,
+  "weight": 65.0,
+  "goal": "lose_weight",
+  "activityLevel": "moderate"
+}
+// goal: lose_weight | maintain | gain_muscle
+// activityLevel: sedentary | light | moderate | active | very_active
+```
+
+保存后自动用 Harris-Benedict 公式重算每日卡路里目标。
+
+### 记录体重
+
+`POST /profile/weight`
+
+```json
+{ "weight": 64.5 }
+```
+
+### 获取体重历史
+
+`GET /profile/weight-history`
+
+---
+
+## 10. 系统
+
+### 健康检查
+
+`GET /health`（无需认证）
 
 ```json
 {
   "status": "ok",
-  "timestamp": "2026-03-13T08:31:49.123Z",
+  "timestamp": "2026-03-17T00:00:00.000Z",
   "uptime": 123.456,
   "database": "connected"
 }
 ```
 
-## 测试示例
+---
 
-### 使用 curl 测试验证码接口
+## 注意事项
 
-```bash
-# 生成验证码
-curl -X GET http://localhost:3000/api/captcha/generate
-
-# 验证验证码
-curl -X POST http://localhost:3000/api/captcha/verify \
-  -H "Content-Type: application/json" \
-  -d '{
-    "captchaId": "your-captcha-id",
-    "captchaCode": "abcd"
-  }'
-
-# 获取验证码统计
-curl -X GET http://localhost:3000/api/captcha/stats
-```
-
-### 使用 curl 测试注册接口
-
-```bash
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "testuser",
-    "password": "123456",
-    "email": "test@example.com"
-  }'
-```
-
-### 使用 curl 测试登录接口
-
-```bash
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "identifier": "testuser",
-    "password": "123456"
-  }'
-```
-
-### 使用 curl 测试获取用户信息 / 检查登录状态
-
-```bash
-# 检查登录状态（未登录）
-curl -X GET http://localhost:3000/api/auth/me
-
-# 检查登录状态（已登录）
-curl -X GET http://localhost:3000/api/auth/me \
-  -H "Authorization: Bearer <your-token>"
-
-# 检查登录状态（token无效）
-curl -X GET http://localhost:3000/api/auth/me \
-  -H "Authorization: Bearer invalid-token"
-```
+- 🔒 标记的接口需要 `Authorization: Bearer <token>` 请求头
+- 所有时间字段使用 ISO 8601 格式（UTC）
+- 分页接口支持 `?page=1&limit=20` 查询参数
+- 图片上传大小限制：10MB
