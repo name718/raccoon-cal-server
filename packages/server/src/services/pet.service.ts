@@ -220,6 +220,42 @@ export async function updatePetOutfit(
   return getPetStatus(userId);
 }
 
+// ─── 升级历史 ─────────────────────────────────────────────────────────────────
+
+/** 单条升级历史记录（对外暴露） */
+export interface PetLevelEventResult {
+  id: number;
+  level: number;
+  unlockedItem: string | null;
+  achievedAt: string; // ISO 8601
+}
+
+/**
+ * 获取宠物升级历史，按 achievedAt 升序排列。
+ *
+ * @param userId 用户 ID
+ * @returns 升级历史列表（升序）
+ */
+export async function getPetLevelHistory(
+  userId: number
+): Promise<PetLevelEventResult[]> {
+  const pet = await prisma.pet.findUnique({ where: { userId } });
+  if (!pet) return [];
+
+  const history = await prisma.petLevelHistory.findMany({
+    where: { petId: pet.id },
+    orderBy: { achievedAt: 'asc' },
+    select: { id: true, level: true, unlockedItem: true, achievedAt: true },
+  });
+
+  return history.map(h => ({
+    id: h.id,
+    level: h.level,
+    unlockedItem: h.unlockedItem,
+    achievedAt: h.achievedAt.toISOString(),
+  }));
+}
+
 /**
  * 获取用户已解锁的装扮 key 列表。
  * 通过 PetLevelHistory 中的 unlockedItem 字段获取。

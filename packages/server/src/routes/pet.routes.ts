@@ -26,6 +26,13 @@ router.post('/interact', authenticateToken, PetController.interact);
 router.put('/outfit', authenticateToken, PetController.updateOutfit);
 
 /**
+ * @route GET /api/pet/level-history
+ * @desc 获取宠物升级历史（按 achievedAt 升序）
+ * @access Private
+ */
+router.get('/level-history', authenticateToken, PetController.getLevelHistory);
+
+/**
  * @route GET /api/pet/outfits
  * @desc 获取已解锁装扮 key 列表
  * @access Private

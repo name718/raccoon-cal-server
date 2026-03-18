@@ -1,6 +1,7 @@
 import type { NextFunction, Response } from 'express';
 import type { AuthenticatedRequest } from '@/types';
 import {
+  getPetLevelHistory,
   getPetStatus,
   getUnlockedOutfits,
   interactWithPet,
@@ -80,6 +81,29 @@ export class PetController {
 
       const status = await updatePetOutfit(userId, outfit);
       ApiResponse.success(res, status, '装扮更新成功');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * GET /api/pet/level-history
+   * 获取宠物升级历史（按 achievedAt 升序）
+   */
+  static async getLevelHistory(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        ApiResponse.error(res, 'AUTH_REQUIRED', '需要登录认证', 401);
+        return;
+      }
+
+      const history = await getPetLevelHistory(userId);
+      ApiResponse.success(res, history, '获取升级历史成功');
     } catch (err) {
       next(err);
     }
