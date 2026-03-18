@@ -68,6 +68,12 @@ export interface NutritionStats {
   avgProtein: number;
   avgFat: number;
   avgCarbs: number;
+  /** 有饮食记录的天数 */
+  totalDays: number;
+  /** 饮食记录总条数 */
+  totalRecords: number;
+  /** 有记录天数的平均卡路里（仅统计有记录的天） */
+  avgCalories: number;
 }
 
 // ─── 辅助函数 ─────────────────────────────────────────────────────────────────
@@ -433,11 +439,31 @@ export async function getNutritionStats(
   const avgFat = days > 0 ? totalFat / days : 0;
   const avgCarbs = days > 0 ? totalCarbs / days : 0;
 
+  // 有饮食记录的天数
+  const totalDays = dailyCalories.filter(d => d.calories > 0).length;
+  // 饮食记录总条数
+  const totalRecords = records.length;
+  // 有记录天数的平均卡路里
+  const totalCaloriesSum = dailyCalories.reduce(
+    (sum, d) => sum + d.calories,
+    0
+  );
+  const avgCalories = totalDays > 0 ? totalCaloriesSum / totalDays : 0;
+
   logger.debug('food.service: nutrition stats computed', {
     userId,
     days,
     recordCount: records.length,
+    totalDays,
   });
 
-  return { dailyCalories, avgProtein, avgFat, avgCarbs };
+  return {
+    dailyCalories,
+    avgProtein,
+    avgFat,
+    avgCarbs,
+    totalDays,
+    totalRecords,
+    avgCalories,
+  };
 }
