@@ -234,6 +234,38 @@ async function main() {
     },
   });
 
+  await prisma.userProfile.upsert({
+    where: { userId: user1.id },
+    update: {},
+    create: {
+      userId: user1.id,
+      nickname: 'Demo 浣熊',
+      gender: 'male',
+      height: 170,
+      weight: 65,
+      age: 25,
+      goal: 'maintain',
+      activityLevel: 'moderately_active',
+      dailyCalTarget: 2200,
+    },
+  });
+
+  await prisma.userProfile.upsert({
+    where: { userId: user2.id },
+    update: {},
+    create: {
+      userId: user2.id,
+      nickname: 'Test 浣熊',
+      gender: 'female',
+      height: 165,
+      weight: 55,
+      age: 24,
+      goal: 'lose_weight',
+      activityLevel: 'lightly_active',
+      dailyCalTarget: 1600,
+    },
+  });
+
   // ── 宠物（幂等 upsert）──────────────────────────────────────────────────────
   await prisma.pet.upsert({
     where: { userId: user1.id },
@@ -260,7 +292,7 @@ async function main() {
     create: { userId: user2.id },
   });
 
-  console.log('✓ 示例用户、宠物、游戏化状态写入完成');
+  console.log('✓ 示例用户、档案、宠物、游戏化状态写入完成');
   console.log('种子数据写入完成！');
   console.log(`  - 成就定义：${ACHIEVEMENT_DEFS.length} 条`);
   console.log(`  - 任务池：${TASK_POOL.length} 种任务类型`);

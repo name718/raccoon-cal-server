@@ -35,6 +35,33 @@ export interface UpdateProfileInput {
   activityLevel?: string;
 }
 
+function ensureCreateProfileInput(
+  userId: number,
+  data: UpdateProfileInput
+): Required<UpdateProfileInput> {
+  if (
+    !data.nickname ||
+    !data.gender ||
+    data.height == null ||
+    data.weight == null ||
+    data.age == null ||
+    !data.goal ||
+    !data.activityLevel
+  ) {
+    throw new Error('PROFILE_CREATE_DATA_INCOMPLETE');
+  }
+
+  return {
+    nickname: data.nickname,
+    gender: data.gender,
+    height: data.height,
+    weight: data.weight,
+    age: data.age,
+    goal: data.goal,
+    activityLevel: data.activityLevel,
+  };
+}
+
 /** 体重记录（对外暴露） */
 export interface WeightRecordResult {
   id: number;
@@ -120,20 +147,19 @@ export async function updateProfile(
 ): Promise<ProfileResult> {
   // 1. 获取当前档案（用于填充重算所需的完整字段）
   const existing = await prisma.userProfile.findUnique({ where: { userId } });
-  if (!existing) {
-    throw new Error('PROFILE_NOT_FOUND');
-  }
 
-  // 2. 合并更新字段
-  const merged = {
-    nickname: data.nickname ?? existing.nickname,
-    gender: data.gender ?? existing.gender,
-    height: data.height ?? existing.height,
-    weight: data.weight ?? existing.weight,
-    age: data.age ?? existing.age,
-    goal: data.goal ?? existing.goal,
-    activityLevel: data.activityLevel ?? existing.activityLevel,
-  };
+  // 2. 合并更新字段；若档案不存在则按传入完整数据创建
+  const merged = existing
+    ? {
+        nickname: data.nickname ?? existing.nickname,
+        gender: data.gender ?? existing.gender,
+        height: data.height ?? existing.height,
+        weight: data.weight ?? existing.weight,
+        age: data.age ?? existing.age,
+        goal: data.goal ?? existing.goal,
+        activityLevel: data.activityLevel ?? existing.activityLevel,
+      }
+    : ensureCreateProfileInput(userId, data);
 
   // 3. 重算每日卡路里目标（Property 27：相同输入始终相同输出）
   const calcParams: CalorieCalculatorParams = {
@@ -148,13 +174,21 @@ export async function updateProfile(
   const newDailyCalTarget = calcDailyCalorieTarget(calcParams);
 
   // 4. 写入 DB
-  const updated = await prisma.userProfile.update({
-    where: { userId },
-    data: {
-      ...merged,
-      dailyCalTarget: newDailyCalTarget,
-    },
-  });
+  const updated = existing
+    ? await prisma.userProfile.update({
+        where: { userId },
+        data: {
+          ...merged,
+          dailyCalTarget: newDailyCalTarget,
+        },
+      })
+    : await prisma.userProfile.create({
+        data: {
+          userId,
+          ...merged,
+          dailyCalTarget: newDailyCalTarget,
+        },
+      });
 
   // 5. 失效 Redis 缓存
   await redis.del(profileCacheKey(userId)).catch(() => null);
@@ -162,6 +196,7 @@ export async function updateProfile(
   logger.info('profile.service: profile updated', {
     userId,
     newDailyCalTarget,
+    created: !existing,
   });
 
   return {

@@ -62,6 +62,15 @@ export class ProfileController {
         ApiResponse.error(res, 'PROFILE_NOT_FOUND', '个人资料不存在', 404);
         return;
       }
+      if ((err as Error).message === 'PROFILE_CREATE_DATA_INCOMPLETE') {
+        ApiResponse.error(
+          res,
+          'PROFILE_CREATE_DATA_INCOMPLETE',
+          '首次创建个人资料时缺少必要字段',
+          400
+        );
+        return;
+      }
       next(err);
     }
   }
