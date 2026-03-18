@@ -37,6 +37,9 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
+  "ts-node": {
+    "files": true
+  },
   "include": ["src/**/*", "prisma/**/*", "prisma.config.ts"],
   "exclude": ["node_modules", "dist", "tests", "**/*.test.ts"]
 }

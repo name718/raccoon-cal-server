@@ -1,8 +1,8 @@
 import { prisma } from '@/config/database';
+import { TASK_POOL } from '@/constants/taskPool';
 import { redis } from '@/config/redis';
 import { logger } from '@/utils/logger';
 import { awardXp } from '@/utils/gamificationEngine';
-import { TASK_POOL } from '../../prisma/seed';
 
 // ─── 类型 ────────────────────────────────────────────────────────────────────
 

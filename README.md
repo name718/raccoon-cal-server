@@ -39,14 +39,11 @@ pnpm install
 # 配置环境变量
 cp packages/server/.env.example packages/server/.env
 
-# 数据库迁移
-pnpm --filter server prisma migrate dev
-
-# 写入初始数据
-pnpm --filter server prisma db seed
+# 一键重建开发数据库（清空现有数据、重建全部表、自动写入 seed）
+pnpm db:setup
 
 # 启动开发服务器
-pnpm --filter server dev
+pnpm dev
 ```
 
 ## 环境变量
@@ -73,13 +70,17 @@ RATE_LIMIT_MAX=100
 ## 常用命令
 
 ```bash
-pnpm --filter server dev          # 开发模式
-pnpm --filter server build        # 编译 TypeScript
-pnpm --filter server start        # 生产模式
-pnpm --filter server test         # 运行测试
-pnpm --filter server lint         # 代码检查
-pnpm --filter server prisma studio  # 数据库可视化
+pnpm db:setup                     # 一键重建开发数据库并写入种子数据
+pnpm dev                          # 开发模式
+pnpm --filter @raccoon-cal/server run build   # 编译 TypeScript
+pnpm --filter @raccoon-cal/server run start   # 生产模式
+pnpm --filter @raccoon-cal/server run test    # 运行测试
+pnpm --filter @raccoon-cal/server run lint    # 代码检查
+pnpm --filter @raccoon-cal/server run db:studio  # 数据库可视化
 ```
+
+`pnpm db:setup` 会执行 Prisma 的
+`migrate reset --force`，按迁移文件重建完整表结构，并自动运行 `prisma/seed.ts`。
 
 ## Docker
 

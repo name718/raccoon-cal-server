@@ -1,43 +1,15 @@
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import 'dotenv/config';
+import { TASK_POOL } from '../src/constants/taskPool';
 
-const prisma = new PrismaClient();
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is required to run Prisma seed.');
+}
 
-// ─── 任务池定义（Property 21：任务池不重复性）───────────────────────────────
-// taskKey 全局唯一，用于每日随机抽取 3 条不重复任务
-export const TASK_POOL = [
-  {
-    taskKey: 'record_breakfast',
-    title: '记录早餐',
-    xpReward: 20,
-  },
-  {
-    taskKey: 'record_lunch',
-    title: '记录午餐',
-    xpReward: 20,
-  },
-  {
-    taskKey: 'record_dinner',
-    title: '记录晚餐',
-    xpReward: 20,
-  },
-  {
-    taskKey: 'record_3_meals',
-    title: '记录三餐',
-    xpReward: 50,
-  },
-  {
-    taskKey: 'stay_in_calorie_goal',
-    title: '今日卡路里达标',
-    xpReward: 30,
-  },
-  {
-    taskKey: 'interact_pet',
-    title: '与小R互动一次',
-    xpReward: 20,
-  },
-] as const;
+const adapter = new PrismaMariaDb(process.env.DATABASE_URL);
+const prisma = new PrismaClient({ adapter });
 
 // ─── 成就定义（20+ 条，Property 22：成就幂等性）──────────────────────────────
 // key 全局唯一，upsert 保证幂等

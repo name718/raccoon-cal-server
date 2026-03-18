@@ -1,4 +1,6 @@
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import { PrismaClient } from '@prisma/client';
+import { config } from '@/config';
 import { logger } from '@/utils/logger';
 
 class Database {
@@ -6,7 +8,10 @@ class Database {
   public prisma: PrismaClient;
 
   private constructor() {
+    const adapter = new PrismaMariaDb(config.database.url);
+
     this.prisma = new PrismaClient({
+      adapter,
       log: [
         { emit: 'stdout', level: 'query' },
         { emit: 'stdout', level: 'error' },

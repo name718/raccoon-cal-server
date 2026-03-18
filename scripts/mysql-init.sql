@@ -1,14 +1,5 @@
 -- 浣熊卡路里数据库初始化脚本
-
--- 创建用户表
-CREATE TABLE IF NOT EXISTS users (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  username VARCHAR(50) UNIQUE NOT NULL,
-  email VARCHAR(100) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  avatar_url VARCHAR(255),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_email (email),
-  INDEX idx_username (username)
-);
+-- 注意：表结构统一由 Prisma migrations 管理。
+-- 开发环境请在服务端目录执行：
+--   pnpm db:setup
+-- 该命令会清空并重建全部表，然后自动写入种子数据。

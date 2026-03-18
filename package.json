@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "dev": "pnpm --filter server dev",
+    "db:setup": "pnpm --filter @raccoon-cal/server run db:setup",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "test:watch": "pnpm -r test:watch",
