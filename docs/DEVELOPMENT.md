@@ -52,6 +52,14 @@ REDIS_URL=redis://localhost:6379
 JWT_SECRET=your-jwt-secret-min-32-chars
 JWT_EXPIRES_IN=7d
 
+# 上传存储（华为云 OBS）
+UPLOAD_PROVIDER=obs
+OBS_ACCESS_KEY_ID=your-huawei-obs-ak
+OBS_SECRET_ACCESS_KEY=your-huawei-obs-sk
+OBS_SERVER=https://obs.cn-east-3.myhuaweicloud.com
+OBS_BUCKET=your-bucket-name
+OBS_PUBLIC_BASE_URL=https://your-bucket-name.obs.cn-east-3.myhuaweicloud.com
+
 # LogMeal AI
 AI_API_KEY=your-logmeal-api-key
 AI_API_URL=https://api.logmeal.es

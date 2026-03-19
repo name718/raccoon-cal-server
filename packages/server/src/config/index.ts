@@ -29,10 +29,20 @@ export const config = {
   },
 
   upload: {
+    provider: process.env.UPLOAD_PROVIDER || 'local',
     maxSize: parseInt(process.env.UPLOAD_MAX_SIZE || '5242880', 10), // 5MB
     allowedTypes: (
       process.env.UPLOAD_ALLOWED_TYPES || 'image/jpeg,image/png,image/webp'
     ).split(','),
+  },
+
+  obs: {
+    accessKeyId: process.env.OBS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.OBS_SECRET_ACCESS_KEY,
+    server: process.env.OBS_SERVER,
+    bucket: process.env.OBS_BUCKET,
+    publicBaseUrl: process.env.OBS_PUBLIC_BASE_URL,
+    keyPrefix: process.env.OBS_KEY_PREFIX || 'raccoon-cal',
   },
 
   aws: {

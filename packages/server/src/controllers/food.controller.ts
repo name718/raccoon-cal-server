@@ -1,7 +1,4 @@
 import type { NextFunction, Response } from 'express';
-import { mkdir, writeFile } from 'node:fs/promises';
-import path from 'node:path';
-import { randomUUID } from 'node:crypto';
 import type { AuthenticatedRequest } from '@/types';
 import {
   deleteFoodRecord,
@@ -11,27 +8,17 @@ import {
   type SaveFoodRecordInput,
 } from '@/services/food.service';
 import { recognizeFood } from '@/services/logmeal.service';
+import {
+  decodeObjectKey,
+  getFoodRecordImage,
+  resolveImageUrlThroughProxy,
+  uploadFoodRecordImage,
+} from '@/services/storage.service';
 import { ApiResponse } from '@/utils/response';
 
 type MulterRequest = AuthenticatedRequest & { file?: Express.Multer.File };
 
 export class FoodController {
-  private static imageExtension(file: Express.Multer.File): string {
-    const byMimeType: Record<string, string> = {
-      'image/jpeg': 'jpg',
-      'image/png': 'png',
-      'image/webp': 'webp',
-    };
-
-    const mapped = byMimeType[file.mimetype];
-    if (mapped) {
-      return mapped;
-    }
-
-    const ext = path.extname(file.originalname).replace('.', '').toLowerCase();
-    return ext || 'jpg';
-  }
-
   /**
    * POST /api/food/recognize
    * 上传图片，调用 LogMeal 识别食物
@@ -126,16 +113,80 @@ export class FoodController {
         return;
       }
 
-      const uploadDir = path.join(process.cwd(), 'uploads', 'food-records');
-      await mkdir(uploadDir, { recursive: true });
+      const requestOrigin = `${req.protocol}://${req.get('host')}`;
+      const { imageUrl } = await uploadFoodRecordImage({
+        buffer: file.buffer,
+        contentType: file.mimetype,
+        originalFilename: file.originalname,
+        requestOrigin,
+        folder: 'food-records',
+        userId,
+      });
 
-      const filename = `food-${userId}-${Date.now()}-${randomUUID()}.${FoodController.imageExtension(file)}`;
-      const filePath = path.join(uploadDir, filename);
-      await writeFile(filePath, file.buffer);
-
-      const imageUrl = `${req.protocol}://${req.get('host')}/uploads/food-records/${filename}`;
       ApiResponse.success(res, { imageUrl }, '图片上传成功', 201);
-    } catch (err) {
+    } catch (err: unknown) {
+      const error = err as { code?: string; message?: string };
+      if (error.code === 'OBS_CONFIG_MISSING') {
+        ApiResponse.error(
+          res,
+          'OBS_CONFIG_MISSING',
+          error.message ?? 'OBS 配置不完整',
+          500
+        );
+        return;
+      }
+      if (error.code === 'OBS_UPLOAD_FAILED') {
+        ApiResponse.error(
+          res,
+          'OBS_UPLOAD_FAILED',
+          error.message ?? 'OBS 上传失败',
+          502
+        );
+        return;
+      }
+      next(err);
+    }
+  }
+
+  /**
+   * GET /media/:encodedKey
+   * 通过服务端代理输出饮食记录图片
+   */
+  static async proxyRecordImage(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const encodedKey = req.params.encodedKey;
+      if (!encodedKey) {
+        ApiResponse.error(res, 'INVALID_IMAGE_KEY', '图片标识不能为空', 400);
+        return;
+      }
+
+      const objectKey = decodeObjectKey(encodedKey);
+      if (!objectKey || objectKey.includes('..') || objectKey.startsWith('/')) {
+        ApiResponse.error(res, 'INVALID_IMAGE_KEY', '图片标识无效', 400);
+        return;
+      }
+
+      const image = await getFoodRecordImage(objectKey);
+      res.setHeader('Content-Type', image.contentType);
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      if (image.contentLength) {
+        res.setHeader('Content-Length', String(image.contentLength));
+      }
+      res.status(200).send(image.body);
+    } catch (err: unknown) {
+      const error = err as NodeJS.ErrnoException & { code?: string };
+      if (error.code === 'ENOENT') {
+        res.status(404).send('Image not found');
+        return;
+      }
+      if (error.code === 'OBS_READ_FAILED') {
+        res.status(502).send('Image unavailable');
+        return;
+      }
       next(err);
     }
   }
@@ -157,8 +208,16 @@ export class FoodController {
       }
 
       const date = req.query.date as string | undefined;
+      const requestOrigin = `${req.protocol}://${req.get('host')}`;
       const records = await getFoodRecords(userId, date);
-      ApiResponse.success(res, records, '获取饮食记录成功');
+      ApiResponse.success(
+        res,
+        records.map(record => ({
+          ...record,
+          imageUrl: resolveImageUrlThroughProxy(record.imageUrl, requestOrigin),
+        })),
+        '获取饮食记录成功'
+      );
     } catch (err) {
       next(err);
     }

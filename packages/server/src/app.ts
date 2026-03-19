@@ -60,7 +60,9 @@ import taskRoutes from '@/routes/task.routes';
 import achievementRoutes from '@/routes/achievement.routes';
 import leagueRoutes from '@/routes/league.routes';
 import profileRoutes from '@/routes/profile.routes';
+import mediaRoutes from '@/routes/media.routes';
 
+app.use('/media', mediaRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/captcha', captchaRoutes);
 app.use('/api/food', foodRoutes);
