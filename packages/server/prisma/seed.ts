@@ -20,28 +20,28 @@ const ACHIEVEMENT_DEFS = [
     title: '初次记录',
     description: '完成第一次饮食记录',
     xpReward: 50,
-    iconName: 'RaccoonHappy',
+    iconName: 'AchievementFirstRecord',
   },
   {
     key: 'record_10',
     title: '记录达人',
     description: '累计完成 10 次饮食记录',
     xpReward: 100,
-    iconName: 'RaccoonExcited',
+    iconName: 'AchievementRecord10',
   },
   {
     key: 'record_50',
     title: '饮食日记',
     description: '累计完成 50 次饮食记录',
     xpReward: 200,
-    iconName: 'RaccoonExcited',
+    iconName: 'AchievementRecord50',
   },
   {
     key: 'record_100',
     title: '百次记录',
     description: '累计完成 100 次饮食记录',
     xpReward: 500,
-    iconName: 'RaccoonSuccess',
+    iconName: 'AchievementRecord100',
   },
   // 卡路里目标类
   {
@@ -49,21 +49,21 @@ const ACHIEVEMENT_DEFS = [
     title: '初次达标',
     description: '第一次完成当日卡路里目标',
     xpReward: 50,
-    iconName: 'RaccoonHappy',
+    iconName: 'AchievementGoalFirstDay',
   },
   {
     key: 'goal_7_days',
     title: '一周达标',
     description: '累计 7 天卡路里达标',
     xpReward: 150,
-    iconName: 'RaccoonGoals',
+    iconName: 'AchievementGoal7Days',
   },
   {
     key: 'goal_30_days',
     title: '月度达标',
     description: '累计 30 天卡路里达标',
     xpReward: 500,
-    iconName: 'RaccoonGoals',
+    iconName: 'AchievementGoal30Days',
   },
   // Streak 连续打卡类
   {
@@ -71,28 +71,28 @@ const ACHIEVEMENT_DEFS = [
     title: '三日连击',
     description: '连续打卡 3 天',
     xpReward: 30,
-    iconName: 'RaccoonHappy',
+    iconName: 'AchievementStreak3',
   },
   {
     key: 'streak_7',
     title: '一周坚持',
     description: '连续打卡 7 天',
     xpReward: 50,
-    iconName: 'RaccoonExcited',
+    iconName: 'AchievementStreak7',
   },
   {
     key: 'streak_30',
     title: '月度坚持',
     description: '连续打卡 30 天',
     xpReward: 200,
-    iconName: 'RaccoonSuccess',
+    iconName: 'AchievementStreak30',
   },
   {
     key: 'streak_100',
     title: '百日坚持',
     description: '连续打卡 100 天',
     xpReward: 1000,
-    iconName: 'RaccoonSuccess',
+    iconName: 'AchievementStreak100',
   },
   // 等级成就类
   {
@@ -100,28 +100,28 @@ const ACHIEVEMENT_DEFS = [
     title: '初级探索者',
     description: '达到 5 级',
     xpReward: 100,
-    iconName: 'RaccoonThinking',
+    iconName: 'AchievementLevel5',
   },
   {
     key: 'level_10',
     title: '中级探索者',
     description: '达到 10 级',
     xpReward: 200,
-    iconName: 'RaccoonThinking',
+    iconName: 'AchievementLevel10',
   },
   {
     key: 'level_20',
     title: '高级探索者',
     description: '达到 20 级',
     xpReward: 500,
-    iconName: 'RaccoonExcited',
+    iconName: 'AchievementLevel20',
   },
   {
     key: 'level_50',
     title: '传奇浣熊',
     description: '达到最高等级 50 级',
     xpReward: 2000,
-    iconName: 'RaccoonSuccess',
+    iconName: 'AchievementLevel50',
   },
   // 任务完成类
   {
@@ -129,21 +129,21 @@ const ACHIEVEMENT_DEFS = [
     title: '任务新手',
     description: '完成第一个每日任务',
     xpReward: 30,
-    iconName: 'RaccoonHappy',
+    iconName: 'AchievementTaskFirst',
   },
   {
     key: 'task_full_day',
     title: '全勤任务',
     description: '单日完成全部 3 个每日任务',
     xpReward: 50,
-    iconName: 'RaccoonExcited',
+    iconName: 'AchievementTaskFullDay',
   },
   {
     key: 'task_full_week',
     title: '任务周冠军',
     description: '连续 7 天完成全部每日任务',
     xpReward: 300,
-    iconName: 'RaccoonSuccess',
+    iconName: 'AchievementTaskFullWeek',
   },
   // 宠物互动类
   {
@@ -151,14 +151,14 @@ const ACHIEVEMENT_DEFS = [
     title: '初次互动',
     description: '第一次与小R互动',
     xpReward: 20,
-    iconName: 'RaccoonGreeting',
+    iconName: 'AchievementPetFirstInteract',
   },
   {
     key: 'pet_interact_30',
     title: '亲密伙伴',
     description: '累计与小R互动 30 次',
     xpReward: 150,
-    iconName: 'RaccoonHappy',
+    iconName: 'AchievementPetInteract30',
   },
   // 联盟类
   {
@@ -166,14 +166,14 @@ const ACHIEVEMENT_DEFS = [
     title: '联盟新人',
     description: '首次加入联盟',
     xpReward: 30,
-    iconName: 'RaccoonGreeting',
+    iconName: 'AchievementLeagueFirstJoin',
   },
   {
     key: 'league_promoted',
     title: '联盟晋升',
     description: '首次在联盟结算中晋升',
     xpReward: 100,
-    iconName: 'RaccoonExcited',
+    iconName: 'AchievementLeaguePromoted',
   },
   // 体重记录类
   {
@@ -181,14 +181,14 @@ const ACHIEVEMENT_DEFS = [
     title: '体重记录',
     description: '第一次记录体重',
     xpReward: 20,
-    iconName: 'RaccoonMeasuring',
+    iconName: 'AchievementWeightFirst',
   },
   {
     key: 'weight_10_records',
     title: '体重追踪者',
     description: '累计记录体重 10 次',
     xpReward: 100,
-    iconName: 'RaccoonMeasuring',
+    iconName: 'AchievementWeight10Records',
   },
 ];
 
