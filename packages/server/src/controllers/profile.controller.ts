@@ -71,6 +71,15 @@ export class ProfileController {
         );
         return;
       }
+      if ((err as Error).message === 'PROFILE_INVALID_INPUT') {
+        ApiResponse.error(
+          res,
+          'PROFILE_INVALID_INPUT',
+          '个人资料格式不正确，请检查身高、体重、年龄和活动水平',
+          400
+        );
+        return;
+      }
       next(err);
     }
   }

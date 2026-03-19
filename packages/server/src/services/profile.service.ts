@@ -35,6 +35,26 @@ export interface UpdateProfileInput {
   activityLevel?: string;
 }
 
+const ACTIVITY_LEVEL_ALIASES: Record<
+  string,
+  CalorieCalculatorParams['activityLevel']
+> = {
+  sedentary: 'sedentary',
+  light: 'lightly_active',
+  lightly_active: 'lightly_active',
+  moderate: 'moderately_active',
+  moderately_active: 'moderately_active',
+  active: 'very_active',
+  very_active: 'very_active',
+  extra_active: 'extra_active',
+};
+
+const GOAL_ALIASES: Record<string, CalorieCalculatorParams['goal']> = {
+  lose_weight: 'lose_weight',
+  maintain: 'maintain',
+  gain_muscle: 'gain_muscle',
+};
+
 function ensureCreateProfileInput(
   userId: number,
   data: UpdateProfileInput
@@ -59,6 +79,44 @@ function ensureCreateProfileInput(
     age: data.age,
     goal: data.goal,
     activityLevel: data.activityLevel,
+  };
+}
+
+function normalizeProfileInput(
+  data: Required<UpdateProfileInput>
+): Required<UpdateProfileInput> {
+  const nickname = data.nickname.trim();
+  if (!nickname) {
+    throw new Error('PROFILE_INVALID_INPUT');
+  }
+
+  if (!Number.isFinite(data.height) || data.height <= 0) {
+    throw new Error('PROFILE_INVALID_INPUT');
+  }
+
+  if (!Number.isFinite(data.weight) || data.weight <= 0) {
+    throw new Error('PROFILE_INVALID_INPUT');
+  }
+
+  if (!Number.isFinite(data.age) || data.age <= 0) {
+    throw new Error('PROFILE_INVALID_INPUT');
+  }
+
+  const normalizedGoal = GOAL_ALIASES[data.goal];
+  const normalizedActivityLevel = ACTIVITY_LEVEL_ALIASES[data.activityLevel];
+
+  if (!normalizedGoal || !normalizedActivityLevel) {
+    throw new Error('PROFILE_INVALID_INPUT');
+  }
+
+  return {
+    nickname,
+    gender: data.gender,
+    height: Math.round(data.height),
+    weight: data.weight,
+    age: Math.round(data.age),
+    goal: normalizedGoal,
+    activityLevel: normalizedActivityLevel,
   };
 }
 
@@ -160,32 +218,33 @@ export async function updateProfile(
         activityLevel: data.activityLevel ?? existing.activityLevel,
       }
     : ensureCreateProfileInput(userId, data);
+  const normalized = normalizeProfileInput(merged);
 
   // 3. 重算每日卡路里目标（Property 27：相同输入始终相同输出）
   const calcParams: CalorieCalculatorParams = {
-    gender: merged.gender as 'male' | 'female',
-    weight: merged.weight,
-    height: merged.height,
-    age: merged.age,
+    gender: normalized.gender === 'male' ? 'male' : 'female',
+    weight: normalized.weight,
+    height: normalized.height,
+    age: normalized.age,
     activityLevel:
-      merged.activityLevel as CalorieCalculatorParams['activityLevel'],
-    goal: merged.goal as CalorieCalculatorParams['goal'],
+      normalized.activityLevel as CalorieCalculatorParams['activityLevel'],
+    goal: normalized.goal as CalorieCalculatorParams['goal'],
   };
   const newDailyCalTarget = calcDailyCalorieTarget(calcParams);
 
   // 4. 写入 DB
   const updated = existing
     ? await prisma.userProfile.update({
-        where: { userId },
+        where: { id: existing.id },
         data: {
-          ...merged,
+          ...normalized,
           dailyCalTarget: newDailyCalTarget,
         },
       })
     : await prisma.userProfile.create({
         data: {
           userId,
-          ...merged,
+          ...normalized,
           dailyCalTarget: newDailyCalTarget,
         },
       });

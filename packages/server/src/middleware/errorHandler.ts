@@ -31,6 +31,11 @@ export const errorHandler = (
     message = 'Database operation failed';
   }
 
+  if (err.name === 'PrismaClientValidationError') {
+    statusCode = 400;
+    message = 'Request data is invalid';
+  }
+
   // JWT 错误处理
   if (err.name === 'JsonWebTokenError') {
     statusCode = 401;
@@ -58,7 +63,6 @@ export const errorHandler = (
     error: {
       code: err.name || 'UNKNOWN_ERROR',
       message,
-      ...(config.env !== 'production' && { stack: err.stack }),
     },
     timestamp: new Date().toISOString(),
   });
