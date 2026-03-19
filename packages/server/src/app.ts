@@ -1,5 +1,6 @@
 import type { Application } from 'express';
 import express from 'express';
+import path from 'node:path';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -35,6 +36,7 @@ app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // 健康检查
 app.get('/health', async (req, res) => {

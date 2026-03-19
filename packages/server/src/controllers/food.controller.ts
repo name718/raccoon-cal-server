@@ -1,4 +1,7 @@
 import type { NextFunction, Response } from 'express';
+import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { randomUUID } from 'node:crypto';
 import type { AuthenticatedRequest } from '@/types';
 import {
   deleteFoodRecord,
@@ -13,6 +16,22 @@ import { ApiResponse } from '@/utils/response';
 type MulterRequest = AuthenticatedRequest & { file?: Express.Multer.File };
 
 export class FoodController {
+  private static imageExtension(file: Express.Multer.File): string {
+    const byMimeType: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+    };
+
+    const mapped = byMimeType[file.mimetype];
+    if (mapped) {
+      return mapped;
+    }
+
+    const ext = path.extname(file.originalname).replace('.', '').toLowerCase();
+    return ext || 'jpg';
+  }
+
   /**
    * POST /api/food/recognize
    * 上传图片，调用 LogMeal 识别食物
@@ -80,6 +99,42 @@ export class FoodController {
 
       const record = await saveFoodRecord(userId, input);
       ApiResponse.success(res, record, '饮食记录保存成功', 201);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * POST /api/food/uploads
+   * 上传饮食记录图片并返回可访问地址
+   */
+  static async uploadRecordImage(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        ApiResponse.error(res, 'AUTH_REQUIRED', '需要登录认证', 401);
+        return;
+      }
+
+      const file = (req as MulterRequest).file;
+      if (!file) {
+        ApiResponse.error(res, 'INVALID_IMAGE', '请上传图片文件', 400);
+        return;
+      }
+
+      const uploadDir = path.join(process.cwd(), 'uploads', 'food-records');
+      await mkdir(uploadDir, { recursive: true });
+
+      const filename = `food-${userId}-${Date.now()}-${randomUUID()}.${FoodController.imageExtension(file)}`;
+      const filePath = path.join(uploadDir, filename);
+      await writeFile(filePath, file.buffer);
+
+      const imageUrl = `${req.protocol}://${req.get('host')}/uploads/food-records/${filename}`;
+      ApiResponse.success(res, { imageUrl }, '图片上传成功', 201);
     } catch (err) {
       next(err);
     }

@@ -1,5 +1,6 @@
 import { type IRouter, Router } from 'express';
 import multer from 'multer';
+import { config } from '@/config';
 import { authenticateToken } from '@/middleware/auth.middleware';
 import { FoodController } from '@/controllers/food.controller';
 
@@ -8,9 +9,9 @@ const router: IRouter = Router();
 // 图片上传：内存存储，限制 10MB
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: config.upload.maxSize },
   fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
+    if (config.upload.allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
       cb(new Error('INVALID_IMAGE'));
@@ -28,6 +29,18 @@ router.post(
   authenticateToken,
   upload.single('image'),
   FoodController.recognize
+);
+
+/**
+ * @route POST /api/food/uploads
+ * @desc 上传饮食记录图片
+ * @access Private
+ */
+router.post(
+  '/uploads',
+  authenticateToken,
+  upload.single('image'),
+  FoodController.uploadRecordImage
 );
 
 /**
