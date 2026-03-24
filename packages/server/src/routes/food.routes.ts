@@ -21,7 +21,7 @@ const upload = multer({
 
 /**
  * @route POST /api/food/recognize
- * @desc 上传图片，调用 LogMeal 识别食物
+ * @desc 上传图片，通过服务端中转调用外部 AI 识别食物
  * @access Private
  */
 router.post(

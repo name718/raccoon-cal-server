@@ -21,7 +21,7 @@ type MulterRequest = AuthenticatedRequest & { file?: Express.Multer.File };
 export class FoodController {
   /**
    * POST /api/food/recognize
-   * 上传图片，调用 LogMeal 识别食物
+   * 上传图片，通过服务端中转调用外部 AI 识别食物
    */
   static async recognize(
     req: AuthenticatedRequest,
@@ -40,6 +40,24 @@ export class FoodController {
       ApiResponse.success(res, result, '食物识别成功');
     } catch (err: unknown) {
       const error = err as { code?: string };
+      if (error.code === 'BAIDU_AI_AUTH_FAILED') {
+        ApiResponse.error(
+          res,
+          'BAIDU_AI_AUTH_FAILED',
+          '百度鉴权失败，请检查服务端配置的 API Key 和 Secret Key',
+          502
+        );
+        return;
+      }
+      if (error.code === 'BAIDU_AI_CONFIG_MISSING') {
+        ApiResponse.error(
+          res,
+          'BAIDU_AI_CONFIG_MISSING',
+          '百度菜品识别配置不完整',
+          500
+        );
+        return;
+      }
       if (error.code === 'AI_TIMEOUT') {
         ApiResponse.error(
           res,

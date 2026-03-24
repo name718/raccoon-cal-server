@@ -53,8 +53,30 @@ export const config = {
   },
 
   ai: {
-    apiKey: process.env.AI_API_KEY,
-    apiUrl: process.env.AI_API_URL || 'https://api.logmeal.es',
+    provider:
+      process.env.AI_PROVIDER ||
+      (process.env.BAIDU_AI_API_KEY && process.env.BAIDU_AI_SECRET_KEY
+        ? 'baidu'
+        : 'logmeal'),
+    timeoutMs: parseInt(process.env.AI_TIMEOUT_MS || '10000', 10),
+    logmeal: {
+      apiKey: process.env.AI_API_KEY,
+      apiUrl: process.env.AI_API_URL || 'https://api.logmeal.es',
+    },
+    baidu: {
+      appId: process.env.BAIDU_AI_APP_ID,
+      apiKey: process.env.BAIDU_AI_API_KEY,
+      secretKey: process.env.BAIDU_AI_SECRET_KEY,
+      oauthUrl:
+        process.env.BAIDU_AI_OAUTH_URL ||
+        'https://aip.baidubce.com/oauth/2.0/token',
+      dishUrl:
+        process.env.BAIDU_AI_DISH_URL ||
+        'https://aip.baidubce.com/rest/2.0/image-classify/v2/dish',
+      topNum: parseInt(process.env.BAIDU_AI_TOP_NUM || '3', 10),
+      filterThreshold: process.env.BAIDU_AI_FILTER_THRESHOLD || '0.7',
+      baikeNum: parseInt(process.env.BAIDU_AI_BAIKE_NUM || '0', 10),
+    },
   },
 
   cors: {
